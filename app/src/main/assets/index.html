@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>DRIVER PAY France</title>
+<script>
+/* Android shell: blob downloads go through the native bridge (WebView can't save them itself). */
+(function(){
+  if(!window.AndroidBridge) return;
+  const blobs=new Map(), origCreate=URL.createObjectURL.bind(URL), origRevoke=URL.revokeObjectURL.bind(URL);
+  URL.createObjectURL=function(b){const u=origCreate(b);if(b instanceof Blob)blobs.set(u,b);return u};
+  URL.revokeObjectURL=function(u){setTimeout(()=>{blobs.delete(u);origRevoke(u)},60000)};
+  const origClick=HTMLAnchorElement.prototype.click;
+  HTMLAnchorElement.prototype.click=function(){
+    const b=blobs.get(this.href);
+    if(b&&this.download){b.text().then(t=>AndroidBridge.saveFile(this.download,b.type||'text/plain',t));return}
+    return origClick.call(this);
+  };
+})();
+</script>
+
+<style>
+:root{--bg:#0d1422;--panel:#172235;--panel2:#202e44;--text:#f4f7fb;--muted:#aab7c9;--accent:#63d6a4;--line:#314159;--danger:#ff8d8d}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#101b2d,#0b1220);color:var(--text);font:16px system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:760px;margin:auto;padding:18px 14px 40px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+h1{font-size:23px;margin:0}h2{font-size:18px;margin:4px 0 12px}.sub,.muted{color:var(--muted);font-size:13px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:16px;margin:14px 0}
+.hero{background:linear-gradient(120deg,#193b3a,#1c2b43)}.amount{font-size:34px;font-weight:750;color:var(--accent);margin:5px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{background:var(--panel2);padding:12px;border-radius:12px}.metric strong{display:block;font-size:20px;margin-top:4px}
+label{display:block;color:var(--muted);font-size:13px;margin:8px 0 5px}
+input{width:100%;background:#0f1929;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px}.check{display:flex;gap:9px;align-items:center;background:var(--panel2);padding:11px;border-radius:10px;color:var(--text)}.check input{width:auto;accent-color:var(--accent)}
+button{border:0;border-radius:11px;padding:12px 15px;font:600 15px system-ui;cursor:pointer;background:var(--accent);color:#10251d}
+button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}button.danger{background:#48252b;color:#ffdada}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1}
+.row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}
+.entry{display:grid;grid-template-columns:58px minmax(0,1fr);gap:12px;padding:13px;margin:0 0 11px;border:1px solid #344a63;border-radius:16px;background:linear-gradient(145deg,#17283d,#142235)}.entry:last-child{margin-bottom:0}.entry-date{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:88px;border:1px solid #42627a;border-radius:13px;background:#20364d;color:#f4f7fb;text-align:center;padding:6px 3px}.entry-date .weekday{font-size:10px;color:#b7c6d6;text-transform:uppercase;letter-spacing:.5px}.entry-date strong{font-size:25px;line-height:1.15}.entry-date .month{font-size:11px;color:#b7c6d6}.entry-main{min-width:0}.entry-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.entry-date-full{font-size:12px;color:var(--muted);margin:1px 0 7px}.entry-money-box{flex-shrink:0;text-align:right;padding:7px 9px;border:1px solid #1e795e;border-radius:12px;background:#123c38;max-width:145px}.entry-money{display:block;color:var(--accent);font-size:17px;font-weight:800;white-space:nowrap}.entry-money-label{display:block;color:#c0d5d5;font-size:10px;font-weight:500}.entry-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:5px 0 9px}.entry-stat{min-width:0;padding:6px 5px;border-right:1px solid #344a63}.entry-stat:last-child{border:0}.entry-stat strong{display:block;font-size:15px;white-space:nowrap}.entry-stat span{display:block;color:var(--muted);font-size:10px;line-height:1.25}.entry-footer{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.entry-tag{font-size:10px;color:#d4e2ec;background:#24374d;border:1px solid #3a5068;border-radius:20px;padding:5px 7px;white-space:nowrap}.entry-tag.on{color:#b9f4dc;border-color:#216c58;background:#123b35}.entry-actions{display:flex;gap:6px;margin-left:auto}.entry-actions button{padding:6px 9px;font-size:11px;border-radius:9px}.entries-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.entries-heading h2{margin:0}.entry-list{display:grid;gap:0}
+small{color:var(--muted)}.hidden{display:none}.notice{font-size:12px;color:var(--muted);line-height:1.45}
+.app-header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:8px 2px 15px;border-bottom:1px solid rgba(170,183,201,.16)}
+.brand{min-width:0}.brand h1{font-size:25px;letter-spacing:.2px}.brand .sub{margin-top:4px;line-height:1.35}
+.language-wrap{display:flex;align-items:center;gap:7px;flex-shrink:0}.language-wrap label{margin:0;font-size:11px;letter-spacing:.5px;text-transform:uppercase}
+#language{background:#0f1929;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 30px 10px 11px;font:600 14px system-ui;max-width:126px}
+nav{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0 18px}
+nav button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px;padding:11px 10px;background:var(--panel2);color:var(--text);border:1px solid transparent;line-height:1.2}
+nav button.active{background:var(--accent);color:#10251d}
+nav button.settings-tab{grid-column:1/-1;justify-self:start;min-height:43px;padding:9px 15px;background:transparent;border:1px solid var(--line);color:var(--muted);font-size:14px}
+nav button.settings-tab.active{background:var(--panel2);border-color:var(--accent);color:var(--text)}
+@media(max-width:430px){.brand h1{font-size:22px}.brand .sub{max-width:210px;font-size:12px}.language-wrap{gap:5px}#language{max-width:112px;padding:9px 23px 9px 9px;font-size:13px}nav button{font-size:14px;min-height:52px}}
+@media(max-width:430px){.grid{grid-template-columns:1fr 1fr}.checks{grid-template-columns:1fr 1fr}}
+
+/* Monthly summary refinement */
+.month-card{padding:16px}
+.month-heading h2{font-size:21px;margin:0 0 3px}
+.month-heading .notice{margin:0 0 12px}
+.month-picker{margin-bottom:4px}
+.month-block{margin-top:20px}
+.section-title{font-size:17px;margin:0 0 10px}
+.month-metrics{gap:9px}
+.month-metrics .metric{min-height:76px;padding:11px 12px;display:flex;flex-direction:column;justify-content:space-between}
+.month-metrics .metric strong{font-size:21px;line-height:1.15;margin-top:7px}
+.month-metrics .metric-last{grid-column:1 / -1;min-height:62px;flex-direction:row;align-items:center}
+.month-metrics .metric-last strong{margin:0}
+.salary-status{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.salary-status>div{background:var(--panel2);border-radius:12px;padding:11px;min-width:0}
+.salary-status span{display:block;font-size:12px;color:var(--muted);line-height:1.35}
+.salary-status strong{display:block;font-size:16px;margin-top:6px}
+.salary-note{display:block;line-height:1.4;margin:9px 1px 12px}
+.detail-list .row{font-size:14px;align-items:flex-start}
+.detail-list .row span{max-width:72%;line-height:1.35}
+.detail-list .row strong{text-align:right;white-space:nowrap}
+.detail-list .salary-net{color:var(--accent);font-size:14px}
+.estimate-card{margin-top:18px;padding:17px;border:1px solid #287e70;border-radius:15px;background:linear-gradient(125deg,#123c39,#1b3049);display:flex;flex-direction:column;gap:7px}
+.estimate-label{font-size:13px;color:#c0d5d5;line-height:1.35}
+.estimate-card>strong{font-size:32px;line-height:1.15;color:var(--accent);font-weight:800;overflow-wrap:anywhere}
+.estimate-card small{font-size:11px;color:#b4c6d0}
+.estimate-note{line-height:1.45;margin:10px 2px 0}
+@media(min-width:560px){.month-metrics .metric-last{grid-column:auto;min-height:76px;display:flex;flex-direction:column;align-items:stretch}.month-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}}
+/* DRIVER PAY refreshed daily overview and cards */
+.month-overview{padding:17px;background:linear-gradient(135deg,#102f35,#172a43);border:1px solid #287e70}
+.overview-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:13px}.overview-heading h2{font-size:21px;margin:2px 0 0}.eyebrow{font-size:11px;color:#9fb9c7;text-transform:uppercase;letter-spacing:.8px}.month-chip{font-size:12px;color:#d8e6ed;border:1px solid #49677d;border-radius:10px;padding:7px 9px;background:#1b3148}
+.overview-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.overview-metric{display:flex;flex-direction:column;min-width:0;padding:11px 10px;border:1px solid #38546b;border-radius:12px;background:rgba(9,22,37,.5)}.overview-metric .metric-icon{font-size:17px;color:#a9c3d2}.overview-metric strong{font-size:22px;line-height:1.2;margin:4px 0 1px;white-space:nowrap}.overview-metric>span:last-child{font-size:11px;color:#b8c8d7}.overview-metric.money-metric{border-color:#24785e;background:#103b37}.overview-metric.money-metric .metric-icon,.overview-metric.money-metric strong{color:var(--accent)}.overview-details{display:flex;flex-wrap:wrap;gap:6px 14px;padding:11px 1px 8px;margin-top:9px;border-top:1px solid rgba(180,205,215,.18)}.overview-details span{font-size:10px;color:#b9c9d6}.overview-details strong{color:#f3f7fb;font-size:11px;margin-left:3px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:390px){.entry{grid-template-columns:49px minmax(0,1fr);gap:8px;padding:10px}.entry-date strong{font-size:22px}.entry-money{font-size:15px}.entry-money-box{padding:6px 7px}.entry-stat strong{font-size:13px}.entry-tag{font-size:9px;padding:4px 6px}.entry-actions button{padding:6px 7px;font-size:10px}}
+
+/* V11 — lista minimalista e compacta */
+.entry{
+  grid-template-columns:44px minmax(0,1fr);
+  gap:9px;
+  padding:9px 0;
+  margin:0;
+  border:0;
+  border-bottom:1px solid rgba(170,183,201,.22);
+  border-radius:0;
+  background:transparent;
+}
+.entry:last-child{border-bottom:0}
+.entry-date{
+  min-height:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  padding:2px 0;
+}
+.entry-date .weekday{font-size:9px;letter-spacing:0}
+.entry-date strong{font-size:21px}
+.entry-date .month{font-size:10px}
+.entry-top{align-items:center;gap:5px}
+.entry-date-full{display:none}
+.entry-money-box{
+  max-width:none;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  white-space:nowrap;
+}
+.entry-money{font-size:16px;line-height:1.2}
+.entry-money-label{font-size:9px;line-height:1.1}
+.entry-stats{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:2px;
+  margin:5px 0 5px;
+}
+.entry-stat{padding:2px 5px;border-right:1px solid rgba(170,183,201,.2)}
+.entry-stat:first-child{padding-left:0}
+.entry-stat strong{font-size:14px}
+.entry-stat span{font-size:9px;white-space:nowrap}
+.entry-footer{gap:5px;min-height:24px}
+.entry-tag{
+  padding:3px 6px;
+  font-size:9px;
+  border-radius:7px;
+  background:transparent;
+  border-color:rgba(170,183,201,.2);
+}
+.entry-actions{gap:4px}
+.entry-actions button{
+  padding:4px 6px;
+  font-size:10px;
+  border-radius:7px;
+}
+.entries-heading{margin-bottom:7px}
+@media(max-width:430px){
+  .entry{grid-template-columns:38px minmax(0,1fr);gap:7px;padding:8px 0}
+  .entry-date strong{font-size:19px}
+  .entry-money{font-size:15px}
+  .entry-stat strong{font-size:13px}
+  .entry-stat span{font-size:8px}
+  .entry-tag{font-size:8px;padding:3px 5px}
+  .entry-actions button{font-size:9px;padding:4px 5px}
+}
+
+
+/* V12 — formulário diário mais compacto e leitura mobile */
+.time-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 10px}
+.time-field{min-width:0}
+.time-field label{margin:0 0 5px;font-size:12px}
+.time-field input{padding:11px 10px;font-size:17px;font-weight:650;text-align:center}
+.daily-total{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;margin:8px 0 12px;border:1px solid rgba(99,214,164,.35);border-radius:11px;background:rgba(16,59,53,.42)}
+.daily-total span{font-size:12px;color:var(--muted)}
+.daily-total strong{font-size:20px;color:var(--accent);white-space:nowrap}
+.allowance-fields{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:6px}
+.allowance-fields>div{min-width:0}
+.allowance-fields .check{height:100%;font-size:12px;padding:9px;line-height:1.25}
+.allowance-fields select{margin-top:5px;padding:9px;font-size:13px}
+.form-card{padding:14px}
+.form-card h2{margin-bottom:8px}
+.form-card .notice{margin:7px 0}
+@media(max-width:390px){
+ main{padding:12px 10px 30px}
+ .form-card{padding:12px}
+ .time-fields{gap:7px}
+ .time-field input{font-size:16px;padding:10px 7px}
+ .allowance-fields{gap:6px}
+ .allowance-fields .check{font-size:11px;padding:8px 6px}
+ .daily-total{padding:8px 10px}
+}
+
+
+
+/* V13 — registo diário simples; valores e histórico apenas no resumo mensal */
+.monthly-days-card{padding:14px}
+.monthly-days-card .entries-heading{margin-bottom:4px}
+.monthly-days-card .notice{margin:4px 0 9px}
+.month-entry{display:grid;grid-template-columns:43px minmax(0,1fr) auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(170,183,201,.2)}
+.month-entry:last-child{border-bottom:0}
+.month-entry-date{display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:2px solid var(--accent);padding-right:7px;min-height:48px;text-align:center}
+.month-entry-date span{font-size:9px;color:var(--muted);text-transform:uppercase}
+.month-entry-date strong{font-size:20px;line-height:1.1}
+.month-entry-main{min-width:0}
+.month-entry-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}
+.month-entry-stat{min-width:0;padding:2px 4px;border-right:1px solid rgba(170,183,201,.18)}
+.month-entry-stat:last-child{border:0}
+.month-entry-stat strong{display:block;font-size:13px;white-space:nowrap}
+.month-entry-stat span{display:block;font-size:9px;color:var(--muted);white-space:nowrap}
+.month-entry-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.month-entry-tag{font-size:9px;padding:3px 5px;border-radius:7px;color:#aab7c9;border:1px solid rgba(170,183,201,.2);white-space:nowrap}
+.month-entry-tag.on{color:#b9f4dc;border-color:#216c58;background:#123b35}
+.month-entry-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+.month-entry-money{font-size:14px;font-weight:800;color:var(--accent);white-space:nowrap;padding:5px 7px;border:1px solid #1e795e;border-radius:9px;background:#123c38}
+.month-entry-actions{display:flex;gap:4px}
+.month-entry-actions button{padding:5px 7px;font-size:10px;border-radius:8px}
+@media(max-width:380px){.month-entry{grid-template-columns:37px minmax(0,1fr) auto;gap:6px}.month-entry-stat{padding:2px}.month-entry-stat strong{font-size:12px}.month-entry-money{font-size:12px;padding:5px}.month-entry-actions button{padding:4px 6px}}
+
+.allowance-option{display:flex;flex-direction:column;gap:7px}.allowance-fields-simple .check{min-height:54px;display:flex;align-items:center}.allowance-fields-simple .location-label{font-size:11px;color:var(--muted);margin:0}.allowance-fields-simple select{margin-top:0;width:100%;padding:9px 10px;font-size:13px;border-radius:10px;background:#0f1929;color:var(--text);border:1px solid var(--line)}
+</style></head>
+<body><main>
+<header class="app-header"><div class="brand"><h1>🚛 DRIVER PAY</h1><div class="sub">Controlo de trabalho e remuneração</div></div><div class="language-wrap"><label for="language" id="languageLabel">Idioma</label><select id="language" aria-label="Idioma / Langue"><option value="pt">🇵🇹 PT</option><option value="fr">🇫🇷 FR</option></select></div></header>
+<nav aria-label="Navegação principal"><button class="active" data-tab="daily"><span aria-hidden="true">▦</span><span>Registo diário</span></button><button data-tab="month"><span aria-hidden="true">▤</span><span>Resumo mensal</span></button><button class="settings-tab" data-tab="settings"><span aria-hidden="true">⚙</span><span>Definições</span></button></nav>
+
+<section id="daily">
+<div class="card form-card">
+<h2>Novo registo</h2>
+<label for="date">Data</label><input id="date" type="date">
+<div class="time-fields">
+  <div class="time-field"><label for="drive">Condução</label><input id="drive" type="tel" inputmode="numeric" autocomplete="off" placeholder="Ex.: 715"></div>
+  <div class="time-field"><label for="work">Outros trabalhos</label><input id="work" type="tel" inputmode="numeric" autocomplete="off" placeholder="Ex.: 315"></div>
+</div>
+<div class="daily-total"><span>Total de horas do dia</span><strong id="dailyTotalPreview">0:00</strong></div>
+
+<p class="notice">Podes registar 0:00 em condução e outros trabalhos. A aplicação identifica automaticamente um fim de semana quando sábado e domingo têm zero horas e pelo menos uma ajuda assinalada em cada dia. Não acrescenta qualquer valor extra por contar o fim de semana.</p>
+<label>Indemnizações de deslocação</label>
+<div class="allowance-fields allowance-fields-simple">
+  <div class="allowance-option">
+    <label class="check"><input id="middayMeal" type="checkbox"> Refeição do meio-dia</label>
+    <label class="location-label" for="middayLocation">Localização</label>
+    <select id="middayLocation" class="hidden" aria-hidden="true" tabindex="-1"><option value="france">França</option><option value="abroad">Estrangeiro</option></select>
+  </div>
+  <div class="allowance-option">
+    <label class="check"><input id="grandDeplacement" type="checkbox"> Grand déplacement (1 refeição + 1 dormida)</label>
+    <label class="location-label" for="grandLocation">Localização</label>
+    <select id="grandLocation" class="hidden" aria-hidden="true" tabindex="-1"><option value="france">França</option><option value="abroad">Estrangeiro</option></select>
+  </div>
+  <div class="allowance-option">
+    <label class="check"><input id="casseCroute" type="checkbox"> Casse-croûte (antes das 5h00)</label>
+  </div>
+</div>
+
+<div class="actions"><button id="save">Guardar registo</button><button class="secondary" id="clear">Limpar</button></div>
+<p class="notice">Escreve o tempo num único campo: 715 significa 7h15; 730 significa 7h30. Carregamentos, descargas, abastecimento e lavagem entram em “outros trabalhos”.</p>
+</div>
+</section>
+
+<section id="month" class="hidden">
+<div class="card month-card">
+  <div class="month-heading">
+    <div><h2>Resumo mensal</h2><p class="notice">A tua atividade e remuneração num só lugar.</p></div>
+  </div>
+  <label for="monthPicker">Mês</label><input id="monthPicker" type="month" class="month-picker">
+
+  <div class="month-block">
+    <h2 class="section-title">Atividade</h2>
+    <div class="grid month-metrics">
+      <div class="metric"><span class="muted">Dias registados</span><strong id="days">0</strong></div>
+      <div class="metric"><span class="muted">Fins de semana com ajudas</span><strong id="weekendsWithAllowances">0</strong></div>
+      <div class="metric"><span class="muted">Total de serviço</span><strong id="hours">0h00</strong></div>
+      <div class="metric"><span class="muted">Condução</span><strong id="driveTotal">0h00</strong></div>
+      <div class="metric"><span class="muted">Outros trabalhos</span><strong id="workTotal">0h00</strong></div>
+      <div class="metric"><span class="muted">Refeições assinaladas</span><strong id="meals">0</strong></div>
+      <div class="metric metric-last"><span class="muted">Dormidas</span><strong id="sleeps">0</strong></div>
+    </div>
+  </div>
+
+  <div class="month-block">
+    <h2 class="section-title">Salário</h2>
+    <div class="salary-status">
+      <div><span class="muted">Percentagem de outros trabalhos</span><strong id="workPct">0%</strong></div>
+      <div><span class="muted">Estado da Prime Chimie</span><strong id="premiumStatus">Por avaliar</strong></div>
+    </div>
+    <small class="muted salary-note">Limite provisório de 33,75%: a Prime é atribuída até esse valor. Acima dele, não é atribuída. Este limite foi inferido do recibo de julho de 2025 e deve ser confirmado com a Hubert.</small>
+    <div class="detail-list">
+      <div class="row"><span><span>Horas normais</span> (<b id="normalHours">0h00</b>)</span><strong id="normalPay">0,00 €</strong></div>
+      <div class="row"><span><span>Horas extra +25%</span> (<b id="hours25">0h00</b>)</span><strong id="pay25">0,00 €</strong></div>
+      <div class="row"><span><span>Horas extra +50%</span> (<b id="hours50">0h00</b>)</span><strong id="pay50">0,00 €</strong></div>
+      <div class="row"><strong>Total das horas remuneradas</strong><strong id="hourPay">0,00 €</strong></div>
+      <div class="row"><span>Prime chimie estimada</span><strong id="premium">0,00 €</strong></div>
+      <div class="row"><strong>Salário bruto estimado</strong><strong id="salarySubtotal">0,00 €</strong></div>
+      <div class="row"><span>Contribuições sociais estimadas</span><strong id="socialDeduction">0,00 €</strong></div>
+      <div class="row"><strong>Net social estimado</strong><strong id="netSocial">0,00 €</strong></div>
+      <div class="row"><span>Base tributável estimada</span><strong id="taxableBase">0,00 €</strong></div>
+      <div class="row"><span>Retenção na fonte (PAS) estimada</span><strong id="pasDeduction">0,00 €</strong></div>
+      <div class="row salary-net"><strong>Salário líquido estimado após PAS</strong><strong id="salaryNet">0,00 €</strong></div>
+    </div>
+  </div>
+
+  <div class="month-block">
+    <h2 class="section-title">Ajudas de deslocação</h2>
+    <div class="detail-list">
+      <div class="row"><strong>Refeições</strong><span class="muted">França / estrangeiro</span></div>
+      <div class="row"><span>Refeição — França (<b id="countMiddayFrance">0</b>)</span><strong id="allowMiddayFrance">0,00 €</strong></div>
+      <div class="row"><span>Refeição — estrangeiro (<b id="countMiddayAbroad">0</b>)</span><strong id="allowMiddayAbroad">0,00 €</strong></div>
+      <div class="row"><strong>Grand déplacement</strong><span class="muted">França / estrangeiro</span></div>
+      <div class="row"><span>Grand déplacement — França (<b id="countGrandFrance">0</b>)</span><strong id="allowGrandFrance">0,00 €</strong></div>
+      <div class="row"><span>Grand déplacement — estrangeiro (<b id="countGrandAbroad">0</b>)</span><strong id="allowGrandAbroad">0,00 €</strong></div>
+      <div class="row"><span>Casse-croûte (<b id="countCasseCroute">0</b>)</span><strong id="allowCasseCroute">0,00 €</strong></div>
+      <div class="row"><strong>Subtotal ajudas de deslocação</strong><strong id="allowSubtotal">Por definir</strong></div>
+    </div>
+  </div>
+
+  <div class="estimate-card">
+    <span class="estimate-label">Total estimado a receber (líquido + ajudas)</span>
+    <strong id="estimate">Por definir</strong>
+    <small>Estimativa baseada nos registos e parâmetros configurados.</small>
+  </div>
+  <p class="notice estimate-note">As indemnizações seguem as duas rubricas do recibo: refeição do meio-dia e Grand déplacement (1 refeição + 1 découcher). Estimativa provisória: aplica os escalões mensais de horas normais, +25% e +50%, soma a Prime Chimie, estima contribuições sociais pela taxa efetiva configurada e calcula o PAS sobre uma base tributável estimada. As taxas foram calibradas com o recibo de julho de 2025 e podem diferir do recibo real.</p>
+</div>
+<div class="card monthly-days-card"><div class="entries-heading"><h2>Registos do mês</h2><span id="entryCount" class="muted">0 registos</span></div><p class="notice">Horas, ajudas e ganho diário estimado.</p><div id="allEntries" class="entry-list muted">Sem registos.</div></div>
+</section>
+
+<section id="settings" class="hidden">
+<div class="card"><h2>Definições de pagamento</h2>
+<label for="rate">Valor hora (€)</label><input id="rate" type="number" min="0" step="0.01">
+<label for="baseHours">Horas normais por mês</label><input id="baseHours" type="number" min="0" step="1">
+<label for="limit25">Limite mensal do escalão +25% (horas)</label><input id="limit25" type="number" min="0" step="1">
+<p class="notice">Regra inicial simulada com base no recibo anterior: até 152 h normais; da 153.ª à 186.ª hora, +25%; acima de 186 h, +50%. Confirma estes limites com a Hubert antes de usar como cálculo definitivo.</p>
+<label for="premiumValue">Prémio (€)</label><input id="premiumValue" type="number" min="0" step="0.01">
+<label for="threshold">Limite máximo de outros trabalhos para manter a prime chimie (%)</label><input id="threshold" type="number" min="0" max="100" step="0.01">
+<label for="socialRate">Taxa efetiva estimada de contribuições sociais (%)</label><input id="socialRate" type="number" min="0" max="100" step="0.01">
+<label for="taxableBasePct">Base tributável estimada (% do bruto)</label><input id="taxableBasePct" type="number" min="0" max="100" step="0.01">
+<label for="pasRate">Retenção na fonte (PAS) estimada (%)</label><input id="pasRate" type="number" min="0" max="100" step="0.1">
+<p class="notice">Valores iniciais calibrados pelo recibo de julho de 2025: contribuições sociais efetivas de 19,47% do bruto; base tributável de 58,39% do bruto; PAS de 3%. São médias observadas num único recibo, incluindo uma exoneração de 101,31 € ligada a horas suplementares. Não são taxas legais universais nem substituem o cálculo oficial da folha salarial. Ajusta-as com recibos recentes.</p>
+<h2 style="margin-top:20px">Indemnizações (recibo atual)</h2>
+<p class="notice">Tarifas atualizadas com base no teu recibo atual. Podes alterá-las se a empresa atualizar os valores.</p>
+<div class="grid">
+<div><label for="vMidday">Refeição do meio-dia — França (€)</label><input id="vMidday" type="number" min="0" step=".01"></div>
+<div><label for="vMiddayAbroad">Refeição do meio-dia — estrangeiro (€)</label><input id="vMiddayAbroad" type="number" min="0" step=".01"></div>
+<div><label for="vGrand">Grand déplacement — França (€)</label><input id="vGrand" type="number" min="0" step=".01"></div>
+<div><label for="vGrandAbroad">Grand déplacement — estrangeiro (€)</label><input id="vGrandAbroad" type="number" min="0" step=".01"></div>
+<div><label for="vCasseCroute">Casse-croûte (€)</label><input id="vCasseCroute" type="number" min="0" step=".01"></div>
+</div>
+<div class="actions"><button id="saveSettings">Guardar definições</button></div>
+<p class="notice">O valor hora inicial é 12,97 €. A natureza bruto/líquido ainda está por confirmar. Os valores das refeições e dormidas ficam em branco até os definires. A aplicação guarda os dados neste dispositivo/navegador.</p>
+</div>
+<div class="card"><h2>Dados</h2><button class="secondary" id="export">Exportar registos (CSV)</button><hr style="border:0;border-top:1px solid var(--line);margin:14px 0"><button class="secondary" id="backupAll">Criar cópia de segurança completa</button> <button class="secondary" id="restoreAll">Restaurar cópia de segurança</button><input id="backupFile" type="file" accept=".json,application/json" hidden><p class="notice">A cópia completa inclui registos, definições de pagamento e idioma. Ao restaurar, os registos são combinados por data: os dias incluídos na cópia substituem os mesmos dias atuais; os restantes são mantidos. As definições e o idioma são recuperados da cópia.</p><button class="danger" id="deleteAll">Apagar todos os registos</button></div>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id), euro=n=>Number(n||0).toLocaleString('pt-PT',{style:'currency',currency:'EUR'}), pad=n=>String(n).padStart(2,'0');
+const today=new Date(), ym= today.getFullYear()+'-'+pad(today.getMonth()+1);
+$('date').value=today.toISOString().slice(0,10);$('monthPicker').value=ym;
+let entries=JSON.parse(localStorage.getItem('driverpay_entries')||'[]');
+let settings=JSON.parse(localStorage.getItem('driverpay_settings')||'{"rate":12.97,"premiumValue":150,"threshold":33.75,"vBreakfast":"","vLunch":"","vDinner":"","vSleep":""}');
+// Atualiza o antigo valor predefinido de 1/3 para o limite provisório observado no recibo de julho de 2025.
+if (Number(settings.threshold)===33.333333) settings.threshold=33.75;
+if (settings.pasRate===undefined) settings.pasRate=3;
+if (settings.socialRate===undefined) settings.socialRate=19.47;
+if (settings.taxableBasePct===undefined) settings.taxableBasePct=58.39;
+if (settings.baseHours===undefined) settings.baseHours=152;
+if (settings.limit25===undefined) settings.limit25=186;
+// Tarifas atualizadas com base no recibo atual fornecido pelo utilizador.
+// Atualiza os antigos valores predefinidos, mas preserva qualquer valor personalizado.
+if(settings.vMidday===undefined || Number(settings.vMidday)===18.20) settings.vMidday=18.36;
+if(settings.vMiddayAbroad===undefined || Number(settings.vMiddayAbroad)===19.50) settings.vMiddayAbroad=19.80;
+if(settings.vGrand===undefined || Number(settings.vGrand)===54.20) settings.vGrand=54.31;
+if(settings.vGrandAbroad===undefined || Number(settings.vGrandAbroad)===61.00) settings.vGrandAbroad=62.00;
+if(settings.vCasseCroute===undefined) settings.vCasseCroute=8.90;
+localStorage.setItem('driverpay_settings',JSON.stringify(settings));
+// Migração compatível: preserva o formato atual e recupera campos de versões anteriores.
+entries=entries.map(e=>{
+  const oldLoc=Array.isArray(e.mealLocations)?e.mealLocations:[];
+  const legacyMeal=Array.isArray(e.meals)?!!(e.meals[1]||e.meals[0]):!!(e.meal||e.midday||e.mealAllowance);
+  const legacyGrand=!!(e.sleep||e.grand||e.grandDeplacementAllowance);
+  const middayLocation=e.middayLocation||e.mealLocation||oldLoc[1]||oldLoc[0]||e.location||'france';
+  const grandLocation=e.grandLocation||e.sleepLocation||oldLoc[3]||oldLoc[2]||e.location||'france';
+  const middayAbroad=middayLocation==='abroad';
+  const grandAbroad=grandLocation==='abroad';
+  // Um indicador de estrangeiro implica a respetiva ajuda; corrige registos antigos inconsistentes.
+  const middayMeal=(e.middayMeal!==undefined?!!e.middayMeal:legacyMeal)||middayAbroad;
+  const grandDeplacement=(e.grandDeplacement!==undefined?!!e.grandDeplacement:legacyGrand)||grandAbroad;
+  return {...e,middayMeal,middayLocation:middayAbroad?'abroad':'france',
+    grandDeplacement,grandLocation:grandAbroad?'abroad':'france'};
+});
+localStorage.setItem('driverpay_entries',JSON.stringify(entries));
+function parseTime(s){
+  s=String(s??'').trim();
+  if(s==='') return 0;
+  let h=0,m=0;
+  if(/^\d{1,2}[:.]\d{1,2}$/.test(s)){const p=s.split(/[:.]/);h=Number(p[0]);m=Number(p[1]);}
+  else if(/^\d{3,4}$/.test(s)){const v=s.padStart(4,'0');h=Number(v.slice(0,2));m=Number(v.slice(2));}
+  else if(/^\d{1,2}$/.test(s)){h=Number(s);m=0;}
+  else return null;
+  if(h>23||m>59)return null;
+  return h*60+m;
+}
+function duration(m){return Math.floor(m/60)+':'+pad(m%60)}
+function updateDailyTotal(){const d=parseTime($('drive').value),w=parseTime($('work').value);$('dailyTotalPreview').textContent=d===null||w===null?'—':duration(d+w)}
+['drive','work'].forEach(id=>$(id).addEventListener('input',updateDailyTotal));
+function saveEntries(){localStorage.setItem('driverpay_entries',JSON.stringify(entries))}
+function monthData(){let month=$('monthPicker').value;let es=entries.filter(e=>e.date.startsWith(month));let d=es.reduce((a,e)=>a+e.drive,0),w=es.reduce((a,e)=>a+e.work,0),total=d+w, pct=total?w/total*100:0;let eligible=total>0&&pct<=Number(settings.threshold)+1e-8;return {es,d,w,total,pct,eligible}}
+function refresh(){let m=monthData();$('days').textContent=m.es.length;$('hours').textContent=duration(m.total);$('driveTotal').textContent=duration(m.d);$('workTotal').textContent=duration(m.w);$('entryCount').textContent=m.es.length+' '+(m.es.length===1?'registo':'registos');
+// Conta um fim de semana quando sábado e domingo têm zero horas
+// e ambos têm pelo menos uma indemnização assinalada.
+const byDate=new Map(m.es.map(e=>[e.date,e]));
+const weekendKeys=new Set();
+m.es.forEach(e=>{
+  const d=new Date(e.date+'T12:00:00');
+  if(d.getDay()!==6 || Number(e.drive||0)+Number(e.work||0)!==0) return;
+  const sun=new Date(d); sun.setDate(sun.getDate()+1);
+  const y=sun.getFullYear(), mo=String(sun.getMonth()+1).padStart(2,'0'), da=String(sun.getDate()).padStart(2,'0');
+  const sunday=byDate.get(`${y}-${mo}-${da}`);
+  const hasAllowance=x=>!!(x&&(x.middayMeal||x.grandDeplacement||x.casseCroute));
+  if(sunday && Number(sunday.drive||0)+Number(sunday.work||0)===0 && hasAllowance(e) && hasAllowance(sunday)) weekendKeys.add(e.date);
+});
+$('weekendsWithAllowances').textContent=weekendKeys.size;
+let countMidday=m.es.filter(e=>e.middayMeal).length;
+let countGrand=m.es.filter(e=>e.grandDeplacement).length;
+let frMid=m.es.filter(e=>e.middayMeal&&e.middayLocation==='france').length;
+let abMid=m.es.filter(e=>e.middayMeal&&e.middayLocation==='abroad').length;
+let frGrand=m.es.filter(e=>e.grandDeplacement&&e.grandLocation==='france').length;
+let abGrand=m.es.filter(e=>e.grandDeplacement&&e.grandLocation==='abroad').length;
+let countCasseCroute=m.es.filter(e=>e.casseCroute).length;
+let allowance=frMid*Number(settings.vMidday)+abMid*Number(settings.vMiddayAbroad)+frGrand*Number(settings.vGrand)+abGrand*Number(settings.vGrandAbroad)+countCasseCroute*Number(settings.vCasseCroute);
+let allowanceComplete=true;
+$('countMiddayFrance').textContent=frMid;$('countMiddayAbroad').textContent=abMid;
+$('countGrandFrance').textContent=frGrand;$('countGrandAbroad').textContent=abGrand;
+$('allowMiddayFrance').textContent=euro(frMid*Number(settings.vMidday));
+$('allowMiddayAbroad').textContent=euro(abMid*Number(settings.vMiddayAbroad));
+$('allowGrandFrance').textContent=euro(frGrand*Number(settings.vGrand));
+$('allowGrandAbroad').textContent=euro(abGrand*Number(settings.vGrandAbroad));
+$('countCasseCroute').textContent=countCasseCroute;$('allowCasseCroute').textContent=euro(countCasseCroute*Number(settings.vCasseCroute));
+$('meals').textContent=countMidday+countGrand;$('sleeps').textContent=countGrand;
+$('workPct').textContent=m.pct.toFixed(1).replace('.',',')+'%';$('premiumStatus').textContent=m.total?(m.eligible?'Atribuída':'Não atribuída'):'Por avaliar';
+let p=m.eligible?Number(settings.premiumValue):0;
+let baseLimit=Math.max(0,Number(settings.baseHours)||152)*60;
+let limit25=Math.max(baseLimit,Number(settings.limit25)||186)*60;
+let normalMinutes=Math.min(m.total,baseLimit);
+let minutes25=Math.min(Math.max(0,m.total-baseLimit),limit25-baseLimit);
+let minutes50=Math.max(0,m.total-limit25);
+let hourlyRate=Number(settings.rate)||0;
+let normalPay=normalMinutes/60*hourlyRate;
+let pay25=minutes25/60*hourlyRate*1.25;
+let pay50=minutes50/60*hourlyRate*1.5;
+let hp=normalPay+pay25+pay50;
+$('normalHours').textContent=duration(normalMinutes);$('hours25').textContent=duration(minutes25);$('hours50').textContent=duration(minutes50);
+$('normalPay').textContent=euro(normalPay);$('pay25').textContent=euro(pay25);$('pay50').textContent=euro(pay50);
+let salary=hp+p;
+let socialRate=Math.max(0,Number(settings.socialRate??19.47))/100;
+let socialDeduction=salary*socialRate;
+let netSocial=salary-socialDeduction;
+let taxableBase=salary*Math.max(0,Number(settings.taxableBasePct??58.39))/100;
+let pas=taxableBase*Math.max(0,Number(settings.pasRate||0))/100;
+let salaryNet=netSocial-pas;
+$('premium').textContent=euro(p);$('hourPay').textContent=euro(hp);$('salarySubtotal').textContent=euro(salary);
+$('socialDeduction').textContent='− '+euro(socialDeduction);$('netSocial').textContent=euro(netSocial);
+$('taxableBase').textContent=euro(taxableBase);$('pasDeduction').textContent='− '+euro(pas);$('salaryNet').textContent=euro(salaryNet);
+$('allowSubtotal').textContent=allowanceComplete?euro(allowance):'Por definir';let totalText=allowanceComplete?euro(salaryNet+allowance):'Por definir';$('estimate').textContent=totalText;
+// Estima o valor líquido diário: aplica os escalões mensais progressivamente por ordem de data,
+// distribui a Prime Chimie proporcionalmente às horas e acrescenta as indemnizações desse dia.
+const chronological=m.es.slice().sort((a,b)=>a.date.localeCompare(b.date));
+let accumulated=0;
+const dailyValues=new Map();
+const socialFactor=Math.max(0,1-Math.max(0,Number(settings.socialRate??19.47))/100-Math.max(0,Number(settings.taxableBasePct??58.39))/100*Math.max(0,Number(settings.pasRate||0))/100);
+const primeForMonth=m.eligible?Number(settings.premiumValue)||0:0;
+for(const e of chronological){
+  const mins=Math.max(0,Number(e.drive||0)+Number(e.work||0));
+  const before=accumulated, after=before+mins;
+  const base= Math.max(0,Number(settings.baseHours)||152)*60;
+  const cap25=Math.max(base,Number(settings.limit25)||186)*60;
+  const n0=Math.min(before,base), n1=Math.min(after,base);
+  const a0=Math.min(Math.max(0,before-base),cap25-base), a1=Math.min(Math.max(0,after-base),cap25-base);
+  const b0=Math.max(0,before-cap25), b1=Math.max(0,after-cap25);
+  const rate=Number(settings.rate)||0;
+  let gross=((n1-n0)/60)*rate+((a1-a0)/60)*rate*1.25+((b1-b0)/60)*rate*1.5;
+  if(m.total>0 && mins>0) gross += primeForMonth*(mins/m.total);
+  const meal=e.middayMeal?(e.middayLocation==='abroad'?Number(settings.vMiddayAbroad):Number(settings.vMidday)):0;
+  const grand=e.grandDeplacement?(e.grandLocation==='abroad'?Number(settings.vGrandAbroad):Number(settings.vGrand)):0;
+  const casse=e.casseCroute?Number(settings.vCasseCroute):0;
+  dailyValues.set(e.date,gross*socialFactor+meal+grand+casse);
+  accumulated=after;
+}
+let html=m.es.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(e=>{const dt=new Date(e.date+'T12:00:00');const wd=new Intl.DateTimeFormat($('language').value==='fr'?'fr-FR':'pt-PT',{weekday:'short'}).format(dt).replace('.','');const mo=new Intl.DateTimeFormat($('language').value==='fr'?'fr-FR':'pt-PT',{month:'short'}).format(dt).replace('.','');return `<article class="month-entry"><div class="month-entry-date"><span>${wd}</span><strong>${e.date.slice(8,10)}</strong><span>${mo}</span></div><div class="month-entry-main"><div class="month-entry-stats"><div class="month-entry-stat"><strong>◉ ${duration(e.drive)}</strong><span>Condução</span></div><div class="month-entry-stat"><strong>🔧 ${duration(e.work)}</strong><span>Outros</span></div><div class="month-entry-stat"><strong>◷ ${duration(e.drive+e.work)}</strong><span>Total</span></div></div><div class="month-entry-tags">${e.middayMeal?`<span class="month-entry-tag on">✓ Refeição${e.middayLocation==='abroad'?' · Estrangeiro':''}</span>`:''}${e.grandDeplacement?`<span class="month-entry-tag on">✓ Grand déplacement${e.grandLocation==='abroad'?' · Estrangeiro':''}</span>`:''}${e.casseCroute?'<span class="month-entry-tag on">✓ Casse-croûte</span>':''}</div></div><div class="month-entry-right"><strong class="month-entry-money">${euro(dailyValues.get(e.date)||0)}</strong><div class="month-entry-actions"><button class="secondary" aria-label="Editar ${e.date}" onclick="editEntry('${e.date}')">✎</button><button class="danger" aria-label="Apagar ${e.date}" onclick="removeEntry('${e.date}')">▣</button></div></div></article>`}).join('')||'Ainda não há registos neste mês.';$('allEntries').innerHTML=html}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+window.removeEntry=date=>{if(confirm('Apagar o registo de '+date+'?')){entries=entries.filter(e=>e.date!==date);saveEntries();refresh()}}
+window.editEntry=date=>{let e=entries.find(x=>x.date===date);if(!e)return;$('date').value=e.date;$('drive').value=duration(e.drive);$('work').value=duration(e.work);updateDailyTotal();$('middayMeal').checked=!!e.middayMeal;$('middayLocation').value=e.middayLocation||'france';$('grandDeplacement').checked=!!e.grandDeplacement;$('grandLocation').value=e.grandLocation||'france';$('casseCroute').checked=!!e.casseCroute;syncAbroadChecks();document.querySelector('[data-tab="daily"]').click();window.scrollTo({top:0,behavior:'smooth'})}
+
+['drive','work'].forEach(id=>{
+  const field=$(id);
+  const normalize=()=>{
+    const raw=field.value.trim();
+    if(!raw) return;
+    const value=parseTime(raw);
+    if(value!==null) field.value=duration(value);
+  };
+  // Ao tocar num campo a zero, seleciona o conteúdo para o novo valor substituir 0:00.
+  field.addEventListener('focus',()=>{
+    if(field.value.trim()==='0:00'){
+      requestAnimationFrame(()=>field.select());
+    }
+  });
+  field.addEventListener('blur',()=>{
+    if(!field.value.trim()) field.value='0:00';
+    normalize();
+  });
+  field.addEventListener('change',normalize);
+});
+$('save').onclick=(event)=>{
+  event.preventDefault();
+  const d=parseTime($('drive').value),w=parseTime($('work').value);
+  if(!$('date').value||d===null||w===null){alert('Verifica a data e os tempos. Podes registar 0:00 quando não trabalhas.');return;}
+  if($('drive').value.trim()) $('drive').value=duration(d);
+  if($('work').value.trim()) $('work').value=duration(w);
+  const e={date:$('date').value,drive:d,work:w,middayMeal:$('middayMeal').checked,middayLocation:$('middayLocation').value,grandDeplacement:$('grandDeplacement').checked,grandLocation:$('grandLocation').value,casseCroute:$('casseCroute').checked};
+  entries=entries.filter(x=>x.date!==e.date);entries.push(e);
+  try{saveEntries();}catch(err){alert('Não foi possível guardar neste navegador. Abre o ficheiro no Chrome e tenta novamente.');return;}
+  $('monthPicker').value=e.date.slice(0,7);refresh();alert('Registo guardado com sucesso.');
+};
+function syncLocationSelectors(){
+  [['middayMeal','middayLocation'],['grandDeplacement','grandLocation']].forEach(([checkId,selectId])=>{
+    const active=$(checkId).checked;
+    $(selectId).classList.toggle('hidden',!active);
+    $(selectId).setAttribute('aria-hidden',String(!active));
+    $(selectId).tabIndex=active?0:-1;
+    if(!active) $(selectId).value='france';
+  });
+}
+$('middayMeal').addEventListener('change',()=>syncLocationSelectors());
+$('grandDeplacement').addEventListener('change',()=>syncLocationSelectors());
+function resetDailyForm(){
+  $('drive').value='0:00';$('work').value='0:00';
+  ['middayMeal','grandDeplacement','casseCroute'].forEach(id=>$(id).checked=false);
+  ['middayLocation','grandLocation'].forEach(id=>$(id).value='france');
+  syncLocationSelectors();
+}
+function loadDailyEntry(e){
+  $('drive').value=duration(e.drive||0);$('work').value=duration(e.work||0);
+  $('middayMeal').checked=!!e.middayMeal;$('middayLocation').value=e.middayLocation||'france';
+  $('grandDeplacement').checked=!!e.grandDeplacement;$('grandLocation').value=e.grandLocation||'france';$('casseCroute').checked=!!e.casseCroute;syncLocationSelectors();
+}
+// Ao mudar de data, começa a zero; se já existir um registo nesse dia, carrega-o para edição.
+$('date').addEventListener('change',()=>{
+  const existing=entries.find(e=>e.date===$('date').value);
+  if(existing) loadDailyEntry(existing); else resetDailyForm();
+});
+resetDailyForm();
+$('clear').onclick=resetDailyForm;
+$('monthPicker').onchange=refresh;
+function loadSettings(){Object.keys(settings).forEach(k=>{if($(k))$(k).value=settings[k]})}loadSettings();
+$('saveSettings').onclick=()=>{['rate','baseHours','limit25','premiumValue','threshold','socialRate','taxableBasePct','pasRate','vMidday','vMiddayAbroad','vGrand','vGrandAbroad','vCasseCroute'].forEach(k=>settings[k]=$(k).value);localStorage.setItem('driverpay_settings',JSON.stringify(settings));refresh();alert('Definições guardadas.')}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));['daily','month','settings'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));if(b.dataset.tab==='month')refresh()});
+$('export').onclick=()=>{let rows=[['Data','Conducao_min','Outros_trabalhos_min','Refeicao_meio_dia','Local_refeicao','Grand_deplacement_1_refeicao_1_decoucher','Local_grand_deplacement','Casse_croute'],...entries.sort((a,b)=>a.date.localeCompare(b.date)).map(e=>[e.date,e.drive,e.work,!!e.middayMeal,e.middayLocation||'france',!!e.grandDeplacement,e.grandLocation||'france',!!e.casseCroute])];let csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\n');let blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='driver-pay-registos.csv';a.click();URL.revokeObjectURL(url)};
+function createCompleteBackup(){try{const backup={app:'DRIVER PAY',formatVersion:1,createdAt:new Date().toISOString(),entries,settings,language:localStorage.getItem('driverpay_language')||'pt'};const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='driver-pay-copia-completa-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);localStorage.setItem('driverpay_backup_last',String(Date.now()));alert((localStorage.getItem('driverpay_language')||'pt')==='fr'?'Sauvegarde complète préparée. Enregistrez le fichier dans un endroit sûr.':'Cópia de segurança completa preparada. Guarda o ficheiro num local seguro.')}catch(err){alert(((localStorage.getItem('driverpay_language')||'pt')==='fr'?'Impossible de créer la sauvegarde : ':'Não foi possível criar a cópia: ')+err.message)}}
+$('backupAll').onclick=createCompleteBackup;
+// Lembrete semanal: pergunta ao abrir a aplicação; o ficheiro só é criado após confirmação do utilizador.
+(function weeklyBackupReminder(){try{const now=Date.now(),last=Number(localStorage.getItem('driverpay_backup_last')||0),snoozed=Number(localStorage.getItem('driverpay_backup_reminder_snooze')||0);const week=7*24*60*60*1000,day=24*60*60*1000;if(now-last>=week&&now-snoozed>=day){const fr=(localStorage.getItem('driverpay_language')||'pt')==='fr';const message=fr?'Cela fait une semaine (ou plus) depuis votre dernière sauvegarde complète. Voulez-vous la créer maintenant ?':'Já passou uma semana (ou mais) desde a última cópia de segurança completa. Queres criá-la agora?';if(confirm(message)){createCompleteBackup()}else{localStorage.setItem('driverpay_backup_reminder_snooze',String(now))}}}catch(err){/* O lembrete nunca deve impedir a abertura da aplicação. */}})();
+$('restoreAll').onclick=()=> $('backupFile').click();
+$('backupFile').onchange=async ev=>{const file=ev.target.files&&ev.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!data||data.app!=='DRIVER PAY'||data.formatVersion!==1||!Array.isArray(data.entries)||!data.settings||typeof data.settings!=='object')throw new Error('O ficheiro não é uma cópia de segurança DRIVER PAY válida.');const valid=data.entries.every(e=>e&&/^\d{4}-\d{2}-\d{2}$/.test(e.date)&&Number.isFinite(Number(e.drive))&&Number.isFinite(Number(e.work)));if(!valid)throw new Error('A cópia contém registos inválidos. Nenhum dado foi alterado.');const byDate=new Map(entries.map(e=>[e.date,e]));let added=0,updated=0;for(const e of data.entries){if(byDate.has(e.date))updated++;else added++;byDate.set(e.date,e)}if(!confirm('Restaurar esta cópia completa?\nRegistos novos: '+added+'\nRegistos atualizados: '+updated+'\nOs outros dias serão mantidos.\nAs definições e o idioma atuais serão substituídos pelos da cópia.'))return;entries=Array.from(byDate.values()).sort((a,b)=>a.date.localeCompare(b.date));settings={...settings,...data.settings};saveEntries();localStorage.setItem('driverpay_settings',JSON.stringify(settings));const lang=data.language==='fr'?'fr':'pt';localStorage.setItem('driverpay_language',lang);loadSettings();refresh();const languageControl=$('language');if(languageControl){languageControl.value=lang;languageControl.dispatchEvent(new Event('change'));}alert('Restauro concluído.\nRegistos novos: '+added+'\nRegistos atualizados: '+updated+'.\nDefinições e idioma recuperados.')}catch(err){alert('Não foi possível restaurar a cópia: '+err.message)}finally{ev.target.value=''}};
+$('deleteAll').onclick=()=>{if(confirm('Tens a certeza de que queres apagar todos os registos?')){entries=[];saveEntries();refresh()}}
+refresh();updateDailyTotal();
+</script>
+<script>
+(function(){
+ const translations = {"Controlo de trabalho e remuneração": "Suivi du travail et de la rémunération", "Contribuições sociais estimadas": "Cotisations sociales estimées", "Net social estimado": "Net social estimé", "Base tributável estimada": "Base imposable estimée", "Taxa efetiva estimada de contribuições sociais (%)": "Taux effectif estimé des cotisations sociales (%)", "Base tributável estimada (% do bruto)": "Base imposable estimée (% du brut)", "Horas normais por mês": "Heures normales par mois", "Limite mensal do escalão +25% (horas)": "Limite mensuelle de la tranche à +25 % (heures)", "Horas normais": "Heures normales", "Horas extra +25%": "Heures supplémentaires +25 %", "Horas extra +50%": "Heures supplémentaires +50 %", "Total das horas remuneradas": "Total des heures rémunérées", "Regra inicial simulada com base no recibo anterior: até 152 h normais; da 153.ª à 186.ª hora, +25%; acima de 186 h, +50%. Confirma estes limites com a Hubert antes de usar como cálculo definitivo.": "Règle initiale simulée d’après l’ancien bulletin : jusqu’à 152 h normales ; de la 153e à la 186e heure, +25 % ; au-delà de 186 h, +50 %. Confirme ces seuils auprès de Hubert avant d’utiliser ce calcul comme définitif.", "Registo diário": "Saisie quotidienne", "Resumo mensal": "Récapitulatif mensuel", "Definições": "Paramètres", "Resumo acumulado do mês": "Récapitulatif du mois", "Salário líquido estimado": "Salaire net estimé", "Por avaliar": "À vérifier", "Ajudas de deslocação": "Indemnités de déplacement", "Por definir": "À définir", "Total estimado": "Total estimé", "Novo registo": "Nouvelle saisie", "Data": "Date", "Condução": "Conduite", "Tempo (escreve 715 → aparece 7:15)": "Durée (saisir 715 → affiche 7:15)", "Outros trabalhos": "Autres travaux", "Podes registar 0:00 em condução e outros trabalhos. A aplicação identifica automaticamente um fim de semana quando sábado e domingo têm zero horas e pelo menos uma ajuda assinalada em cada dia. Não acrescenta qualquer valor extra por contar o fim de semana.": "Tu peux saisir 0:00 en conduite et en autres travaux. L’application détecte automatiquement un week-end lorsque le samedi et le dimanche sont à zéro heure et qu’au moins une indemnité est cochée chaque jour. Aucun montant supplémentaire n’est ajouté.", "Indemnizações de deslocação": "Indemnités de déplacement", "Refeição do meio-dia": "Repas de midi", "Casse-croûte (antes das 5h00)": "Casse-croûte (avant 5 h)", "Casse-croûte (€)": "Casse-croûte (€)", "Casse-croûte": "Casse-croûte", "Refeição no estrangeiro": "Repas à l’étranger", "Dormida no estrangeiro": "Nuitée à l’étranger", "França": "France", "Estrangeiro": "Étranger", "Grand déplacement (1 refeição + 1 découcher)": "Grand déplacement (1 repas + 1 découcher)", "Grand déplacement (1 refeição + 1 dormida)": "Grand déplacement (1 repas + 1 découcher)", "Guardar registo": "Enregistrer", "Limpar": "Effacer", "Registos deste mês": "Saisies du mois", "Ainda não há registos.": "Aucune saisie pour le moment.", "Mês": "Mois", "Dias registados": "Jours enregistrés", "Fins de semana com ajudas": "Week-ends avec indemnités", "Total de serviço": "Temps de service total", "Refeições assinaladas": "Repas cochés", "Dormidas": "Découchers", "Salário": "Salaire", "Percentagem de outros trabalhos": "Pourcentage des autres travaux", "Estado da Prime Chimie": "Statut de la Prime Chimie", "Horas × valor hora configurado": "Heures × taux horaire configuré", "Prime chimie estimada": "Prime Chimie estimée", "Salário bruto estimado": "Salaire brut estimé", "Retenção na fonte (PAS) estimada": "Prélèvement à la source (PAS) estimé", "Salário líquido estimado após PAS": "Salaire net estimé après PAS", "Subtotal ajudas de deslocação": "Sous-total des indemnités de déplacement", "Total estimado a receber (líquido + ajudas)": "Total estimé à percevoir (net + indemnités)", "Todos os dias": "Tous les jours", "Valor estimado do dia": "Valeur estimée du jour", "Valor diário líquido estimado, incluindo ajudas. As horas suplementares seguem os escalões acumulados do mês; a Prime Chimie é distribuída proporcionalmente pelos dias com horas.": "Valeur nette journalière estimée, indemnités incluses. Les heures supplémentaires suivent les tranches cumulées du mois ; la Prime Chimie est répartie proportionnellement entre les jours travaillés.", "Sem registos.": "Aucune saisie.", "Definições de pagamento": "Paramètres de rémunération", "Valor hora (€)": "Taux horaire (€)", "Prémio (€)": "Prime (€)", "Limite máximo de outros trabalhos para manter a prime chimie (%)": "Seuil maximal d’autres travaux pour conserver la Prime Chimie (%)", "Retenção na fonte (PAS) estimada (%)": "Prélèvement à la source (PAS) estimé (%)", "Indemnizações (recibo atual)": "Indemnités (bulletin actuel)", "Tarifas atualizadas com base no teu recibo atual. Podes alterá-las se a empresa atualizar os valores.": "Tarifs mis à jour d’après ton bulletin actuel. Tu peux les modifier si l’entreprise les met à jour.", "Refeição do meio-dia — França (€)": "Repas de midi — France (€)", "Refeição do meio-dia — estrangeiro (€)": "Repas de midi — étranger (€)", "Grand déplacement — França (€)": "Grand déplacement — France (€)", "Grand déplacement — estrangeiro (€)": "Grand déplacement — étranger (€)", "Guardar definições": "Enregistrer les paramètres", "Dados": "Données", "Exportar registos (CSV)": "Exporter les saisies (CSV)", "Criar cópia de segurança completa": "Créer une sauvegarde complète", "Restaurar cópia de segurança": "Restaurer une sauvegarde", "A cópia completa inclui registos, definições de pagamento e idioma. Ao restaurar, os registos são combinados por data: os dias incluídos na cópia substituem os mesmos dias atuais; os restantes são mantidos. As definições e o idioma são recuperados da cópia.": "La sauvegarde complète inclut les saisies, les paramètres de rémunération et la langue. Lors de la restauration, les saisies sont fusionnées par date : les dates présentes dans la sauvegarde remplacent les mêmes dates actuelles ; les autres sont conservées. Les paramètres et la langue sont restaurés depuis la sauvegarde.", "Apagar todos os registos": "Supprimer toutes les saisies", "Editar": "Modifier", "Apagar": "Supprimer", "Atribuída": "Attribuée", "Não atribuída": "Non attribuée", "Limite provisório: 33,75% de outros trabalhos no total mensal. Baseado no recibo de julho de 2025; confirmar com a Hubert.": "Seuil provisoire : 33,75 % d’autres travaux sur le total mensuel. Basé sur le bulletin de juillet 2025 ; à confirmer auprès de Hubert.", "Limite provisório de 33,75%: a Prime é atribuída até esse valor. Acima dele, não é atribuída. Este limite foi inferido do recibo de julho de 2025 e deve ser confirmado com a Hubert.": "Seuil provisoire de 33,75 % : la prime est attribuée jusqu’à ce seuil. Au-delà, elle ne l’est pas. Seuil déduit du bulletin de juillet 2025, à confirmer auprès de Hubert.", "Não representa necessariamente o líquido a receber.": "Ne représente pas nécessairement le montant net réellement versé.", "Este mês": "Ce mois-ci", "Resumo acumulado": "Récapitulatif cumulé", "Horas totais": "Heures totales", "registo": "saisie", "registos": "saisies", "Refeição": "Repas", "Refeições": "Repas", "Refeição — França": "Repas — France", "Refeição — estrangeiro": "Repas — étranger", "Grand déplacement — França": "Grand déplacement — France", "Grand déplacement — estrangeiro": "Grand déplacement — étranger", "Casse-croûte (": "Casse-croûte ("};
+ const langSelect=document.getElementById('language');
+ function translateText(node,lang){
+   if(node.nodeType===Node.TEXT_NODE){
+     const raw=node.nodeValue, trimmed=raw.trim();
+     if(translations[trimmed]) node.nodeValue=raw.replace(trimmed,lang==='fr'?translations[trimmed]:Object.keys(translations).find(k=>translations[k]===trimmed)||trimmed);
+   }
+   else if(node.nodeType===Node.ELEMENT_NODE && !['SCRIPT','STYLE','SELECT','OPTION'].includes(node.tagName)){
+     for(const child of node.childNodes) translateText(child,lang);
+   }
+ }
+ function applyLanguage(lang){
+   document.documentElement.lang=lang;
+   const languageLabel=document.getElementById('languageLabel');
+   if(languageLabel){ languageLabel.textContent=(document.getElementById('language').value==='fr')?'Langue':'Idioma'; languageLabel.setAttribute('aria-label', languageLabel.textContent); }
+   // Keep source strings stable and translate from a stored original copy.
+   document.querySelectorAll('[data-pt]').forEach(el=>{el.textContent=lang==='fr'?el.dataset.fr:el.dataset.pt;});
+   document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(translations[k])el.textContent=lang==='fr'?translations[k]:k;});
+   // Translate text nodes in the visible app, including labels and notes.
+   walk(document.querySelector('main'),lang);
+   localStorage.setItem('driverpay_language',lang);
+ }
+ function walk(root,lang){
+   if(!root)return;
+   const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+   let n;
+   while((n=walker.nextNode())){
+     const raw=n.nodeValue, v=raw.trim();
+     if(!v)continue;
+     let next=v;
+     if(lang==='fr' && Object.prototype.hasOwnProperty.call(translations,v)) next=translations[v];
+     else if(lang==='pt'){
+       const original=Object.keys(translations).find(k=>translations[k]===v);
+       if(original)next=original;
+     }
+     // Do not rewrite unchanged text: MutationObserver would otherwise
+     // observe its own writes and repeatedly trigger the language pass.
+     if(next!==v)n.nodeValue=raw.replace(v,next);
+   }
+ }
+ const saved=localStorage.getItem('driverpay_language')||'pt';
+ langSelect.value=saved;applyLanguage(saved);
+ langSelect.addEventListener('change',()=>{applyLanguage(langSelect.value);const label=document.getElementById('languageLabel');if(label)label.textContent=langSelect.value==='fr'?'Langue':'Idioma';});
+ const main=document.querySelector('main');
+ if(main){
+   let translating=false;
+   const observer=new MutationObserver(()=>{
+     if(translating)return;
+     const lang=langSelect.value;
+     if(lang==='fr'){
+       translating=true;
+       walk(main,'fr');
+       translating=false;
+     }
+   });
+   observer.observe(main,{childList:true,subtree:true,characterData:true});
+ }
+})();
+</script>
+
+</body></html>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DRIVER PAY</string>
+    <string name="saved">Ficheiro guardado / Fichier enregistré</string>
+    <string name="save_failed">Erro ao guardar: </string>
+</resources>
