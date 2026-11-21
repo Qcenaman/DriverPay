@@ -1,9 +1,9 @@
-## DRIVER PAY 1.0.0
+## DRIVER PAY 1.1.0
 
-First Android version of DRIVER PAY (based on the V14 web page).
+Updated to your V15.2 page.
 
-- Daily log, monthly summary and settings work exactly like the original page (PT / FR)
-- Data is stored inside the app on the phone
-- CSV export and full backup now save as real files (you choose where)
-- Restore backup opens the phone's file picker
-- Confirm / alert pop-ups shown as native dialogs
+- New compact mobile layout
+- Live "estimated value of this day" card while entering hours and allowances
+- Settings button now also closes settings (back to daily log)
+- Weekly reminder to make a full backup
+- Existing data on the phone is kept

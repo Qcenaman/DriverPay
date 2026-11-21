@@ -39,6 +39,9 @@ button.secondary{background:var(--panel2);color:var(--text);border:1px solid var
 small{color:var(--muted)}.hidden{display:none}.notice{font-size:12px;color:var(--muted);line-height:1.45}
 .app-header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:8px 2px 15px;border-bottom:1px solid rgba(170,183,201,.16)}
 .brand{min-width:0}.brand h1{font-size:25px;letter-spacing:.2px}.brand .sub{margin-top:4px;line-height:1.35}
+.settings-icon-btn{width:42px;height:42px;min-height:42px;padding:9px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:1px solid var(--line);border-radius:50%;color:var(--muted);flex:none}
+.settings-icon-btn svg{width:22px;height:22px;display:block}
+.settings-icon-btn:active,.settings-icon-btn.active{color:var(--accent);border-color:var(--accent);background:rgba(54,211,153,.08)}
 .language-wrap{display:flex;align-items:center;gap:7px;flex-shrink:0}.language-wrap label{margin:0;font-size:11px;letter-spacing:.5px;text-transform:uppercase}
 #language{background:#0f1929;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 30px 10px 11px;font:600 14px system-ui;max-width:126px}
 nav{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0 18px}
@@ -46,7 +49,7 @@ nav button{display:flex;align-items:center;justify-content:center;gap:8px;min-he
 nav button.active{background:var(--accent);color:#10251d}
 nav button.settings-tab{grid-column:1/-1;justify-self:start;min-height:43px;padding:9px 15px;background:transparent;border:1px solid var(--line);color:var(--muted);font-size:14px}
 nav button.settings-tab.active{background:var(--panel2);border-color:var(--accent);color:var(--text)}
-@media(max-width:430px){.brand h1{font-size:22px}.brand .sub{max-width:210px;font-size:12px}.language-wrap{gap:5px}#language{max-width:112px;padding:9px 23px 9px 9px;font-size:13px}nav button{font-size:14px;min-height:52px}}
+@media(max-width:430px){.settings-icon-btn{width:38px;height:38px;min-height:38px;padding:8px}.brand h1{font-size:22px}.brand .sub{max-width:210px;font-size:12px}.language-wrap{gap:5px}#language{max-width:112px;padding:9px 23px 9px 9px;font-size:13px}nav button{font-size:14px;min-height:52px}}
 @media(max-width:430px){.grid{grid-template-columns:1fr 1fr}.checks{grid-template-columns:1fr 1fr}}
 
 /* Monthly summary refinement */
@@ -166,7 +169,7 @@ nav button.settings-tab.active{background:var(--panel2);border-color:var(--accen
 .allowance-fields select{margin-top:5px;padding:9px;font-size:13px}
 .form-card{padding:14px}
 .form-card h2{margin-bottom:8px}
-.form-card .notice{margin:7px 0}
+.form-card .notice{margin:7px 0;font-size:11px;line-height:1.4}
 @media(max-width:390px){
  main{padding:12px 10px 30px}
  .form-card{padding:12px}
@@ -193,6 +196,7 @@ nav button.settings-tab.active{background:var(--panel2);border-color:var(--accen
 .month-entry-stat{min-width:0;padding:2px 4px;border-right:1px solid rgba(170,183,201,.18)}
 .month-entry-stat:last-child{border:0}
 .month-entry-stat strong{display:block;font-size:13px;white-space:nowrap}
+.month-entry-stat .tachograph-wheel{width:14px;height:14px;vertical-align:-2px;color:inherit;display:inline-block}
 .month-entry-stat span{display:block;font-size:9px;color:var(--muted);white-space:nowrap}
 .month-entry-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
 .month-entry-tag{font-size:9px;padding:3px 5px;border-radius:7px;color:#aab7c9;border:1px solid rgba(170,183,201,.2);white-space:nowrap}
@@ -203,42 +207,170 @@ nav button.settings-tab.active{background:var(--panel2);border-color:var(--accen
 .month-entry-actions button{padding:5px 7px;font-size:10px;border-radius:8px}
 @media(max-width:380px){.month-entry{grid-template-columns:37px minmax(0,1fr) auto;gap:6px}.month-entry-stat{padding:2px}.month-entry-stat strong{font-size:12px}.month-entry-money{font-size:12px;padding:5px}.month-entry-actions button{padding:4px 6px}}
 
-.allowance-option{display:flex;flex-direction:column;gap:7px}.allowance-fields-simple .check{min-height:54px;display:flex;align-items:center}.allowance-fields-simple .location-label{font-size:11px;color:var(--muted);margin:0}.allowance-fields-simple select{margin-top:0;width:100%;padding:9px 10px;font-size:13px;border-radius:10px;background:#0f1929;color:var(--text);border:1px solid var(--line)}
+.allowance-option{display:grid;grid-template-columns:minmax(0,1fr);align-items:center;gap:8px;padding:7px 10px;background:var(--panel2);border:1px solid rgba(170,183,201,.10);border-radius:12px;min-width:0}
+.allowance-option.has-location{grid-template-columns:minmax(0,2.4fr) minmax(108px,1fr);gap:8px}
+.allowance-fields-simple .check{min-height:48px;display:flex;align-items:center;background:transparent;padding:7px 4px;gap:9px;line-height:1.2;min-width:0;font-size:13.5px}
+.allowance-fields-simple .check input{flex:none;width:20px}
+.allowance-fields-simple .check .daily-icon{flex:none;width:19px;height:19px}
+.allowance-fields-simple .check-label{flex:1;min-width:0}
+.allowance-fields-simple .check-label.meal-label{white-space:nowrap}
+.allowance-fields-simple .check-label.grand-label{text-wrap:balance}
+.allowance-location{display:flex;flex-direction:column;gap:4px;min-width:0}.allowance-location.hidden{display:none!important}
+.allowance-fields-simple .location-label{font-size:10px;color:var(--muted);margin:0}
+.allowance-fields-simple select{margin-top:0;width:100%;min-width:0;padding:8px 8px;font-size:12px;border-radius:9px;background:#0f1929;color:var(--text);border:1px solid var(--line)}
+@media(max-width:390px){.allowance-option.has-location{grid-template-columns:minmax(0,2.25fr) minmax(100px,1fr);gap:6px;padding:6px 7px}.allowance-fields-simple .check{font-size:12.5px;gap:7px}.allowance-fields-simple select{font-size:11px;padding:8px 6px}}
+
+.month-legend{display:flex;flex-wrap:wrap;align-items:center;gap:7px 16px;margin:-4px 0 10px;padding:0 1px;color:var(--muted);font-size:11px}.month-legend span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}.month-legend .tachograph-wheel{width:14px;height:14px;display:inline-block;color:var(--muted)}.month-legend b{font-size:13px;font-weight:600;color:var(--muted)}
+
+
+
+
+
+
+.daily-estimate{margin:15px 0 12px;padding:14px;border:1px solid #287e83;border-radius:16px;background:linear-gradient(125deg,#103b39,#102b3d);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.daily-estimate-heading{display:flex;align-items:center;gap:9px;margin-bottom:10px;color:#f4f7fb;font-size:14px;font-weight:800;letter-spacing:.15px}
+.daily-estimate-heading svg{width:23px;height:23px;flex:none;color:var(--accent)}
+.daily-estimate-grid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:10px;align-items:center}
+.daily-estimate-main{min-width:0;border-right:1px solid rgba(180,205,215,.3);padding:5px 10px 5px 0}
+.daily-estimate-main strong{display:block;color:var(--accent);font-size:clamp(27px,7.6vw,42px);font-weight:850;line-height:1.08;letter-spacing:-1.2px;white-space:nowrap}
+.daily-estimate-breakdown{min-width:0;display:grid;gap:7px}
+.daily-estimate-line{display:flex;justify-content:space-between;align-items:center;gap:6px;color:#e4edf3;font-size:11px;line-height:1.3}
+.daily-estimate-line .line-label{display:flex;align-items:center;gap:5px;min-width:0}
+.daily-estimate-line .line-icon{width:15px;height:15px;flex:none;color:#d6e5ec}
+.daily-estimate-line strong{font-size:12px;white-space:nowrap}
+.daily-estimate-line.total{padding-top:7px;border-top:1px solid rgba(220,235,240,.65);color:var(--accent);font-size:12px;font-weight:800}
+.daily-estimate-line.total strong{font-size:13px}
+.daily-estimate-foot{margin:9px 1px 0;color:#c3d5dc;font-size:10px;line-height:1.4;font-style:italic}
+.daily-estimate-info:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+.daily-icon{width:18px;height:18px;display:inline-block;vertical-align:-4px;flex:none;color:currentColor}
+.field-label-icon{display:inline-flex;align-items:center;gap:7px}
+.allowance-heading{display:flex;align-items:center;gap:8px}
+.allowance-fields-simple{grid-template-columns:1fr;gap:8px}.allowance-fields-simple .allowance-option{width:100%}.allowance-fields-simple .check{gap:12px;min-height:54px;width:100%;font-size:14px;padding:11px 13px;flex-direction:row;justify-content:flex-start}.allowance-fields-simple .check input{flex:none;width:18px;height:18px}.allowance-fields-simple .check .daily-icon{width:21px;height:21px;flex:none;color:#d5e2ed}
+.allowance-fields-simple .check .daily-icon{width:19px;height:19px;color:#d5e2ed}
+.action-icon{width:19px;height:19px;vertical-align:-4px;margin-right:6px}
+.help-note{display:flex;align-items:flex-start;gap:9px;margin:10px 0 0;padding:9px 11px;border:1px solid rgba(170,183,201,.15);border-radius:12px;background:rgba(32,46,68,.45);font-size:11px;line-height:1.4;color:var(--muted)}
+.help-note svg{width:18px;height:18px;flex:none;color:#c6d8e8;margin-top:1px}
+@media(max-width:390px){.daily-estimate{padding:11px}.daily-estimate-grid{grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:7px}.daily-estimate-main{padding-right:7px}.daily-estimate-main strong{font-size:clamp(24px,7vw,31px);letter-spacing:-1px}.daily-estimate-line{font-size:10px;gap:4px}.daily-estimate-line strong{font-size:10px}.daily-estimate-line.total{font-size:10px}.daily-estimate-line.total strong{font-size:11px}.daily-estimate-foot{font-size:10px}}
+
+
+/* V15 — aproximação rigorosa ao layout de referência mobile */
+:root{--bg:#061a2c;--panel:#09243a;--panel2:#102d46;--text:#f4f7fb;--muted:#a9bdcf;--accent:#00e5a0;--line:#29445d}
+body{background:linear-gradient(160deg,#061a2c 0%,#031426 100%)}
+main{max-width:760px;padding:10px 6px 30px}
+.app-header{padding:5px 2px 9px;gap:8px}
+.brand h1{font-size:22px}
+.brand .sub{font-size:11px}
+#language{padding:7px 22px 7px 8px;font-size:12px;border-radius:9px}
+.language-wrap label{font-size:10px}
+.settings-icon-btn{width:34px;height:34px;min-height:34px;padding:6px}
+nav{gap:6px;margin:9px 0 10px}
+nav button{min-height:34px;padding:7px 6px;font-size:13px;border-radius:10px;gap:7px}
+.card{margin:8px 0;border-radius:15px;padding:11px}
+.form-card{padding:10px;background:linear-gradient(145deg,#09243a,#071d32);border-color:#31516b;border-radius:16px}
+.form-card h2{font-size:18px;margin:1px 0 7px}
+.form-card>label{margin:5px 0 4px;font-size:12px}
+.form-card input:not([type=checkbox]),.form-card select{border-radius:10px}
+#date{padding:8px 10px;font-size:15px;min-height:34px}
+.time-fields{gap:8px;margin:6px 0 8px}
+.time-field label{font-size:11px;margin:0 0 3px;gap:5px}
+.time-field input{padding:8px 7px;font-size:16px;min-height:34px;border-radius:10px}
+.daily-total{padding:7px 10px;margin:7px 0 9px;border-radius:9px;background:rgba(0,229,160,.10);border-color:rgba(0,229,160,.5)}
+.daily-total span{font-size:11px}
+.daily-total strong{font-size:19px;color:#00e5a0}
+.allowance-heading{font-size:13px;margin:5px 0 5px!important;gap:6px}
+.allowance-fields-simple{gap:5px;margin-top:4px}
+.allowance-fields-simple .allowance-option{padding:4px 7px;border-radius:11px;background:linear-gradient(110deg,#102f49,#0d2941);border-color:rgba(126,165,190,.17);gap:6px}
+.allowance-fields-simple .allowance-option.has-location{grid-template-columns:minmax(0,2.35fr) minmax(105px,1fr);gap:7px}
+.allowance-fields-simple .check{min-height:37px;padding:4px 3px;gap:8px;font-size:12.5px;line-height:1.15}
+.allowance-fields-simple .check input{width:17px;height:17px;accent-color:#00e5a0}
+.allowance-fields-simple .check .daily-icon{width:18px;height:18px;color:#e0edf5}
+.allowance-fields-simple .check-label.meal-label{white-space:nowrap}
+.allowance-fields-simple .check-label.grand-label{text-wrap:balance}
+.allowance-fields-simple .location-label{font-size:9px;margin:0 0 2px}
+.allowance-fields-simple select{padding:6px 7px;font-size:11px;min-height:29px;border-radius:8px}
+.daily-estimate{margin:10px 0 9px;padding:10px;border-radius:13px;background:linear-gradient(125deg,#073b3a,#092b43);border-color:#168d7e}
+.daily-estimate-heading{font-size:13px;gap:7px;margin-bottom:7px}
+.daily-estimate-heading svg{width:20px;height:20px}
+.daily-estimate-grid{grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:7px}
+.daily-estimate-main{padding:3px 7px 3px 0}
+.daily-estimate-main strong{font-size:clamp(25px,7vw,36px);letter-spacing:-1px}
+.daily-estimate-breakdown{gap:5px}
+.daily-estimate-line{font-size:10px;gap:4px}
+.daily-estimate-line .line-icon{width:13px;height:13px}
+.daily-estimate-line strong{font-size:11px}
+.daily-estimate-line.total{padding-top:5px;font-size:11px}
+.daily-estimate-line.total strong{font-size:12px}
+.daily-estimate-foot{font-size:9px;margin:7px 1px 0}
+.actions{gap:7px;margin-top:9px}
+.actions button{min-height:36px;padding:8px 8px;font-size:13px;border-radius:10px}
+.action-icon{width:17px;height:17px;vertical-align:-4px;margin-right:4px}
+@media(max-width:390px){
+ main{padding:8px 6px 26px}
+ .form-card{padding:9px}
+ .allowance-fields-simple .allowance-option.has-location{grid-template-columns:minmax(0,2.2fr) minmax(98px,1fr);gap:5px;padding:4px 6px}
+ .allowance-fields-simple .check{font-size:11.5px;gap:6px}
+ .allowance-fields-simple select{font-size:10.5px;padding:6px 5px}
+ .daily-estimate{padding:9px}
+ .daily-estimate-main strong{font-size:clamp(23px,6.8vw,30px)}
+ .daily-estimate-line{font-size:9.5px}
+ .daily-estimate-line strong{font-size:10px}
+}
+
 </style></head>
 <body><main>
-<header class="app-header"><div class="brand"><h1>🚛 DRIVER PAY</h1><div class="sub">Controlo de trabalho e remuneração</div></div><div class="language-wrap"><label for="language" id="languageLabel">Idioma</label><select id="language" aria-label="Idioma / Langue"><option value="pt">🇵🇹 PT</option><option value="fr">🇫🇷 FR</option></select></div></header>
-<nav aria-label="Navegação principal"><button class="active" data-tab="daily"><span aria-hidden="true">▦</span><span>Registo diário</span></button><button data-tab="month"><span aria-hidden="true">▤</span><span>Resumo mensal</span></button><button class="settings-tab" data-tab="settings"><span aria-hidden="true">⚙</span><span>Definições</span></button></nav>
+<header class="app-header"><div class="brand"><h1>🚛 DRIVER PAY</h1><div class="sub">Controlo de trabalho e remuneração</div></div><div class="language-wrap"><label for="language" id="languageLabel">Idioma</label><select id="language" aria-label="Idioma / Langue"><option value="pt">🇵🇹 PT</option><option value="fr">🇫🇷 FR</option></select><button type="button" class="settings-icon-btn" data-tab="settings" aria-label="Definições" title="Definições"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="m19.4 13.5 1.1.9-1.5 2.6-1.4-.5a7.9 7.9 0 0 1-1.7 1l-.2 1.5h-3l-.3-1.5a7.9 7.9 0 0 1-1.7-1l-1.4.5-1.5-2.6 1.1-.9a7.2 7.2 0 0 1 0-2l-1.1-.9 1.5-2.6 1.4.5a7.9 7.9 0 0 1 1.7-1l.3-1.5h3l.2 1.5a7.9 7.9 0 0 1 1.7 1l1.4-.5 1.5 2.6-1.1.9a7.2 7.2 0 0 1 0 2Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button></div></header>
+<nav aria-label="Navegação principal"><button class="active" data-tab="daily"><span aria-hidden="true">▦</span><span>Registo diário</span></button><button data-tab="month"><span aria-hidden="true">▤</span><span>Resumo mensal</span></button></nav>
 
 <section id="daily">
 <div class="card form-card">
-<h2>Novo registo</h2>
-<label for="date">Data</label><input id="date" type="date">
+<h2><svg class="daily-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="17" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 2.5v4M16 2.5v4M3.5 9h17M12 12v6M9 15h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Novo registo</h2>
+<label for="date" class="field-label-icon"><svg class="daily-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="17" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 2.5v4M16 2.5v4M3.5 9h17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Data</label><input id="date" type="date">
 <div class="time-fields">
-  <div class="time-field"><label for="drive">Condução</label><input id="drive" type="tel" inputmode="numeric" autocomplete="off" placeholder="Ex.: 715"></div>
-  <div class="time-field"><label for="work">Outros trabalhos</label><input id="work" type="tel" inputmode="numeric" autocomplete="off" placeholder="Ex.: 315"></div>
+  <div class="time-field"><label for="drive" class="field-label-icon"><svg class="daily-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 9.5 10 11m10-1.5L14 11m-2 3v7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Condução</label><input id="drive" type="tel" inputmode="numeric" autocomplete="off" placeholder="Ex.: 715"></div>
+  <div class="time-field"><label for="work" class="field-label-icon"><svg class="daily-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6.5a5 5 0 0 0-6.2 6.2L3 18l3 3 5.3-5.3a5 5 0 0 0 6.2-6.2l-3 3-3-3 3-3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Outros trabalhos</label><input id="work" type="tel" inputmode="numeric" autocomplete="off" placeholder="Ex.: 315"></div>
 </div>
-<div class="daily-total"><span>Total de horas do dia</span><strong id="dailyTotalPreview">0:00</strong></div>
+<div class="daily-total"><span class="field-label-icon"><svg class="daily-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Total de horas do dia</span><strong id="dailyTotalPreview">0:00</strong></div>
 
-<p class="notice">Podes registar 0:00 em condução e outros trabalhos. A aplicação identifica automaticamente um fim de semana quando sábado e domingo têm zero horas e pelo menos uma ajuda assinalada em cada dia. Não acrescenta qualquer valor extra por contar o fim de semana.</p>
-<label>Indemnizações de deslocação</label>
+
+<label class="allowance-heading"><svg class="daily-icon" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 5v5c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 10v5c0 1.7 3.6 3 8 3s8-1.3 8-3v-5" fill="none" stroke="currentColor" stroke-width="2"/></svg>Indemnizações de deslocação</label>
 <div class="allowance-fields allowance-fields-simple">
   <div class="allowance-option">
-    <label class="check"><input id="middayMeal" type="checkbox"> Refeição do meio-dia</label>
-    <label class="location-label" for="middayLocation">Localização</label>
-    <select id="middayLocation" class="hidden" aria-hidden="true" tabindex="-1"><option value="france">França</option><option value="abroad">Estrangeiro</option></select>
+    <label class="check"><input id="middayMeal" type="checkbox"><svg class="daily-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3v7m-3-7v5a3 3 0 0 0 6 0V3M5 10v11M15 3v18m0-18c4 2 5 6 5 10h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="check-label meal-label">Refeição do meio-dia</span></label>
+    <div class="allowance-location hidden" id="middayLocationWrap" aria-hidden="true">
+      <label class="location-label" for="middayLocation">Localização</label>
+      <select id="middayLocation" aria-hidden="true" tabindex="-1"><option value="france">França</option><option value="abroad">Estrangeiro</option></select>
+    </div>
   </div>
   <div class="allowance-option">
-    <label class="check"><input id="grandDeplacement" type="checkbox"> Grand déplacement (1 refeição + 1 dormida)</label>
-    <label class="location-label" for="grandLocation">Localização</label>
-    <select id="grandLocation" class="hidden" aria-hidden="true" tabindex="-1"><option value="france">França</option><option value="abroad">Estrangeiro</option></select>
+    <label class="check"><input id="grandDeplacement" type="checkbox"><svg class="daily-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19V5m0 10h18v4M3 12h18v3M6 12V9a2 2 0 0 1 2-2h3a3 3 0 0 1 3 3v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="check-label grand-label">Grand déplacement (1 refeição + 1 dormida)</span></label>
+    <div class="allowance-location hidden" id="grandLocationWrap" aria-hidden="true">
+      <label class="location-label" for="grandLocation">Localização</label>
+      <select id="grandLocation" aria-hidden="true" tabindex="-1"><option value="france">França</option><option value="abroad">Estrangeiro</option></select>
+    </div>
   </div>
   <div class="allowance-option">
-    <label class="check"><input id="casseCroute" type="checkbox"> Casse-croûte (antes das 5h00)</label>
+    <label class="check"><input id="casseCroute" type="checkbox"><svg class="daily-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h15a0 0 0 0 1 0 0v2a7 7 0 0 1-7 7h-1a7 7 0 0 1-7-7v-2ZM19 11h1a2 2 0 0 1 0 4h-2M7 4c0 1 1 1 1 2M12 3c0 1 1 1 1 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Casse-croûte (antes das 5h00)</label>
   </div>
 </div>
 
-<div class="actions"><button id="save">Guardar registo</button><button class="secondary" id="clear">Limpar</button></div>
-<p class="notice">Escreve o tempo num único campo: 715 significa 7h15; 730 significa 7h30. Carregamentos, descargas, abastecimento e lavagem entram em “outros trabalhos”.</p>
+<div class="daily-estimate" id="dailyEstimateCard" aria-live="polite">
+  <div class="daily-estimate-heading">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><ellipse cx="12" cy="5" rx="8" ry="3" fill="currentColor"/><path d="M4 5v4c0 1.7 3.6 3 8 3s8-1.3 8-3V5c0 1.7-3.6 3-8 3S4 6.7 4 5Z" fill="currentColor" opacity=".78"/><path d="M4 10v4c0 1.7 3.6 3 8 3s8-1.3 8-3v-4c0 1.7-3.6 3-8 3s-8-1.3-8-3Z" fill="currentColor" opacity=".58"/><path d="M4 15v4c0 1.7 3.6 3 8 3s8-1.3 8-3v-4c0 1.7-3.6 3-8 3s-8-1.3-8-3Z" fill="currentColor" opacity=".38"/></svg>
+    <span data-i18n="VALOR ESTIMADO DESTE DIA">VALOR ESTIMADO DESTE DIA</span>
+  </div>
+  <div class="daily-estimate-grid">
+    <div class="daily-estimate-main"><strong id="dailyEstimateTotal">€ 0,00</strong></div>
+    <div class="daily-estimate-breakdown">
+      <div class="daily-estimate-line"><span class="line-label"><svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span><span data-i18n="Remuneração">Remuneração</span> (<span id="dailyEstimateHours">0:00</span>)</span></span><strong id="dailyEstimatePay">0,00 €</strong></div>
+      <div class="daily-estimate-line"><span class="line-label"><svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span data-i18n="Ajudas / diárias">Ajudas / diárias</span></span><strong id="dailyEstimateAllowances">0,00 €</strong></div>
+      <div class="daily-estimate-line total"><span data-i18n="Total estimado">Total estimado</span><strong id="dailyEstimateTotalSmall">0,00 €</strong></div>
+    </div>
+  </div>
+  <p class="daily-estimate-foot" data-i18n="Estimativa atualizada com as horas e ajudas registadas.">Estimativa atualizada com as horas e ajudas registadas.</p>
+</div>
+<div class="actions"><button id="save"><svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h13l4 4v14H3V3h1Zm3 0v7h10V3M7 21v-8h10v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Guardar registo</button><button class="secondary" id="clear"><svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-9 0 1 14h10l1-14M10 11v6m4-6v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Limpar</button></div>
+
 </div>
 </section>
 
@@ -268,7 +400,7 @@ nav button.settings-tab.active{background:var(--panel2);border-color:var(--accen
       <div><span class="muted">Percentagem de outros trabalhos</span><strong id="workPct">0%</strong></div>
       <div><span class="muted">Estado da Prime Chimie</span><strong id="premiumStatus">Por avaliar</strong></div>
     </div>
-    <small class="muted salary-note">Limite provisório de 33,75%: a Prime é atribuída até esse valor. Acima dele, não é atribuída. Este limite foi inferido do recibo de julho de 2025 e deve ser confirmado com a Hubert.</small>
+    <small class="muted salary-note">Regra da Prime Chimie: é atribuída quando as horas de outros trabalhos representam, no máximo, 33,75% do total de horas trabalhadas no mês (condução + outros trabalhos). Acima desse limite, o prémio não é atribuído.</small>
     <div class="detail-list">
       <div class="row"><span><span>Horas normais</span> (<b id="normalHours">0h00</b>)</span><strong id="normalPay">0,00 €</strong></div>
       <div class="row"><span><span>Horas extra +25%</span> (<b id="hours25">0h00</b>)</span><strong id="pay25">0,00 €</strong></div>
@@ -303,9 +435,8 @@ nav button.settings-tab.active{background:var(--panel2);border-color:var(--accen
     <strong id="estimate">Por definir</strong>
     <small>Estimativa baseada nos registos e parâmetros configurados.</small>
   </div>
-  <p class="notice estimate-note">As indemnizações seguem as duas rubricas do recibo: refeição do meio-dia e Grand déplacement (1 refeição + 1 découcher). Estimativa provisória: aplica os escalões mensais de horas normais, +25% e +50%, soma a Prime Chimie, estima contribuições sociais pela taxa efetiva configurada e calcula o PAS sobre uma base tributável estimada. As taxas foram calibradas com o recibo de julho de 2025 e podem diferir do recibo real.</p>
 </div>
-<div class="card monthly-days-card"><div class="entries-heading"><h2>Registos do mês</h2><span id="entryCount" class="muted">0 registos</span></div><p class="notice">Horas, ajudas e ganho diário estimado.</p><div id="allEntries" class="entry-list muted">Sem registos.</div></div>
+<div class="card monthly-days-card"><div class="entries-heading"><h2>Registos do mês</h2><span id="entryCount" class="muted">0 registos</span></div><p class="notice">Horas, ajudas e ganho diário estimado.</p><div class="month-legend" aria-label="Legenda"><span><svg class="tachograph-wheel" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9.35" fill="none" stroke="currentColor" stroke-width="2.65"/><path d="M3.05 9.65 8.65 9.2Q10.05 9.05 11 8.15Q12 7.2 13 8.15Q13.95 9.05 15.35 9.2L20.95 9.65V13.85L15.15 14.35Q13.35 14.5 13.15 16.25L12.65 21.15H11.35L10.85 16.25Q10.65 14.5 8.85 14.35L3.05 13.85Z" fill="currentColor"/><circle cx="12" cy="11.9" r="2.05" fill="currentColor"/></svg> Condução</span><span><b aria-hidden="true">🔧</b> Outros</span><span><b aria-hidden="true">◷</b> Total</span></div><div id="allEntries" class="entry-list muted">Sem registos.</div></div>
 </section>
 
 <section id="settings" class="hidden">
@@ -313,13 +444,13 @@ nav button.settings-tab.active{background:var(--panel2);border-color:var(--accen
 <label for="rate">Valor hora (€)</label><input id="rate" type="number" min="0" step="0.01">
 <label for="baseHours">Horas normais por mês</label><input id="baseHours" type="number" min="0" step="1">
 <label for="limit25">Limite mensal do escalão +25% (horas)</label><input id="limit25" type="number" min="0" step="1">
-<p class="notice">Regra inicial simulada com base no recibo anterior: até 152 h normais; da 153.ª à 186.ª hora, +25%; acima de 186 h, +50%. Confirma estes limites com a Hubert antes de usar como cálculo definitivo.</p>
+<p class="notice">Regra inicial simulada com base no recibo anterior: até 152 h normais; da 153.ª à 186.ª hora, +25%; acima de 186 h, +50%.</p>
 <label for="premiumValue">Prémio (€)</label><input id="premiumValue" type="number" min="0" step="0.01">
 <label for="threshold">Limite máximo de outros trabalhos para manter a prime chimie (%)</label><input id="threshold" type="number" min="0" max="100" step="0.01">
 <label for="socialRate">Taxa efetiva estimada de contribuições sociais (%)</label><input id="socialRate" type="number" min="0" max="100" step="0.01">
 <label for="taxableBasePct">Base tributável estimada (% do bruto)</label><input id="taxableBasePct" type="number" min="0" max="100" step="0.01">
 <label for="pasRate">Retenção na fonte (PAS) estimada (%)</label><input id="pasRate" type="number" min="0" max="100" step="0.1">
-<p class="notice">Valores iniciais calibrados pelo recibo de julho de 2025: contribuições sociais efetivas de 19,47% do bruto; base tributável de 58,39% do bruto; PAS de 3%. São médias observadas num único recibo, incluindo uma exoneração de 101,31 € ligada a horas suplementares. Não são taxas legais universais nem substituem o cálculo oficial da folha salarial. Ajusta-as com recibos recentes.</p>
+<p class="notice">Os valores apresentados são estimativas e podem diferir do recibo de vencimento.</p>
 <h2 style="margin-top:20px">Indemnizações (recibo atual)</h2>
 <p class="notice">Tarifas atualizadas com base no teu recibo atual. Podes alterá-las se a empresa atualizar os valores.</p>
 <div class="grid">
@@ -330,7 +461,7 @@ nav button.settings-tab.active{background:var(--panel2);border-color:var(--accen
 <div><label for="vCasseCroute">Casse-croûte (€)</label><input id="vCasseCroute" type="number" min="0" step=".01"></div>
 </div>
 <div class="actions"><button id="saveSettings">Guardar definições</button></div>
-<p class="notice">O valor hora inicial é 12,97 €. A natureza bruto/líquido ainda está por confirmar. Os valores das refeições e dormidas ficam em branco até os definires. A aplicação guarda os dados neste dispositivo/navegador.</p>
+
 </div>
 <div class="card"><h2>Dados</h2><button class="secondary" id="export">Exportar registos (CSV)</button><hr style="border:0;border-top:1px solid var(--line);margin:14px 0"><button class="secondary" id="backupAll">Criar cópia de segurança completa</button> <button class="secondary" id="restoreAll">Restaurar cópia de segurança</button><input id="backupFile" type="file" accept=".json,application/json" hidden><p class="notice">A cópia completa inclui registos, definições de pagamento e idioma. Ao restaurar, os registos são combinados por data: os dias incluídos na cópia substituem os mesmos dias atuais; os restantes são mantidos. As definições e o idioma são recuperados da cópia.</p><button class="danger" id="deleteAll">Apagar todos os registos</button></div>
 </section>
@@ -384,10 +515,50 @@ function parseTime(s){
   return h*60+m;
 }
 function duration(m){return Math.floor(m/60)+':'+pad(m%60)}
-function updateDailyTotal(){const d=parseTime($('drive').value),w=parseTime($('work').value);$('dailyTotalPreview').textContent=d===null||w===null?'—':duration(d+w)}
+function updateDailyTotal(){const d=parseTime($('drive').value),w=parseTime($('work').value);$('dailyTotalPreview').textContent=d===null||w===null?'—':duration(d+w);if(typeof updateDailyEstimate==='function')updateDailyEstimate()}
 ['drive','work'].forEach(id=>$(id).addEventListener('input',updateDailyTotal));
 function saveEntries(){localStorage.setItem('driverpay_entries',JSON.stringify(entries))}
 function monthData(){let month=$('monthPicker').value;let es=entries.filter(e=>e.date.startsWith(month));let d=es.reduce((a,e)=>a+e.drive,0),w=es.reduce((a,e)=>a+e.work,0),total=d+w, pct=total?w/total*100:0;let eligible=total>0&&pct<=Number(settings.threshold)+1e-8;return {es,d,w,total,pct,eligible}}
+function dailyEuro(n){const lang=localStorage.getItem('driverpay_language')||'pt';const amount=Number(n||0).toLocaleString(lang==='fr'?'fr-FR':'pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2});return lang==='fr'?amount+' €':'€ '+amount}
+function updateDailyEstimate(){
+  const date=$('date').value, drive=parseTime($('drive').value), work=parseTime($('work').value);
+  if(!date||drive===null||work===null){['dailyEstimateTotal','dailyEstimateTotalSmall','dailyEstimatePay','dailyEstimateAllowances'].forEach(id=>$(id).textContent='—');$('dailyEstimateHours').textContent='—';return;}
+  const draft={date,drive,work,middayMeal:$('middayMeal').checked,middayLocation:$('middayLocation').value||'france',grandDeplacement:$('grandDeplacement').checked,grandLocation:$('grandLocation').value||'france',casseCroute:$('casseCroute').checked};
+  const month=date.slice(0,7);
+  const monthEntries=entries.filter(e=>e.date.startsWith(month)&&e.date!==date).concat(draft).sort((a,b)=>a.date.localeCompare(b.date));
+  const totalMinutes=monthEntries.reduce((sum,e)=>sum+Number(e.drive||0)+Number(e.work||0),0);
+  const otherMinutes=monthEntries.reduce((sum,e)=>sum+Number(e.work||0),0);
+  const eligible=totalMinutes>0&&(otherMinutes/totalMinutes*100)<=Number(settings.threshold)+1e-8;
+  const prime=eligible?(Number(settings.premiumValue)||0):0;
+  const base=Math.max(0,Number(settings.baseHours)||152)*60;
+  const cap25=Math.max(base,Number(settings.limit25)||186)*60;
+  let accumulated=0, gross=0;
+  for(const e of monthEntries){
+    const mins=Math.max(0,Number(e.drive||0)+Number(e.work||0));
+    const before=accumulated, after=before+mins;
+    const n0=Math.min(before,base),n1=Math.min(after,base);
+    const a0=Math.min(Math.max(0,before-base),cap25-base),a1=Math.min(Math.max(0,after-base),cap25-base);
+    const b0=Math.max(0,before-cap25),b1=Math.max(0,after-cap25);
+    const rate=Number(settings.rate)||0;
+    const dayGross=((n1-n0)/60)*rate+((a1-a0)/60)*rate*1.25+((b1-b0)/60)*rate*1.5;
+    const allocatedPrime=totalMinutes>0&&mins>0?prime*(mins/totalMinutes):0;
+    if(e.date===date)gross=dayGross+allocatedPrime;
+    accumulated=after;
+  }
+  const socialFactor=Math.max(0,1-Math.max(0,Number(settings.socialRate??19.47))/100-Math.max(0,Number(settings.taxableBasePct??58.39))/100*Math.max(0,Number(settings.pasRate||0))/100);
+  const remuneration=gross*socialFactor;
+  const meal=draft.middayMeal?(draft.middayLocation==='abroad'?Number(settings.vMiddayAbroad):Number(settings.vMidday)):0;
+  const grand=draft.grandDeplacement?(draft.grandLocation==='abroad'?Number(settings.vGrandAbroad):Number(settings.vGrand)):0;
+  const casse=draft.casseCroute?(Number(settings.vCasseCroute)||0):0;
+  const allowances=meal+grand+casse;
+  const total=remuneration+allowances;
+  $('dailyEstimateHours').textContent=duration(drive+work);
+  $('dailyEstimatePay').textContent=euro(remuneration);
+  $('dailyEstimateAllowances').textContent=euro(allowances);
+  $('dailyEstimateTotal').textContent=dailyEuro(total);
+  $('dailyEstimateTotalSmall').textContent=euro(total);
+}
+
 function refresh(){let m=monthData();$('days').textContent=m.es.length;$('hours').textContent=duration(m.total);$('driveTotal').textContent=duration(m.d);$('workTotal').textContent=duration(m.w);$('entryCount').textContent=m.es.length+' '+(m.es.length===1?'registo':'registos');
 // Conta um fim de semana quando sábado e domingo têm zero horas
 // e ambos têm pelo menos uma indemnização assinalada.
@@ -445,13 +616,12 @@ $('premium').textContent=euro(p);$('hourPay').textContent=euro(hp);$('salarySubt
 $('socialDeduction').textContent='− '+euro(socialDeduction);$('netSocial').textContent=euro(netSocial);
 $('taxableBase').textContent=euro(taxableBase);$('pasDeduction').textContent='− '+euro(pas);$('salaryNet').textContent=euro(salaryNet);
 $('allowSubtotal').textContent=allowanceComplete?euro(allowance):'Por definir';let totalText=allowanceComplete?euro(salaryNet+allowance):'Por definir';$('estimate').textContent=totalText;
-// Estima o valor líquido diário: aplica os escalões mensais progressivamente por ordem de data,
-// distribui a Prime Chimie proporcionalmente às horas e acrescenta as indemnizações desse dia.
+// Estima o valor líquido diário: aplica os escalões mensais progressivamente por ordem de data
+// e acrescenta as indemnizações desse dia. A Prime Chimie é calculada apenas no resumo mensal.
 const chronological=m.es.slice().sort((a,b)=>a.date.localeCompare(b.date));
 let accumulated=0;
 const dailyValues=new Map();
 const socialFactor=Math.max(0,1-Math.max(0,Number(settings.socialRate??19.47))/100-Math.max(0,Number(settings.taxableBasePct??58.39))/100*Math.max(0,Number(settings.pasRate||0))/100);
-const primeForMonth=m.eligible?Number(settings.premiumValue)||0:0;
 for(const e of chronological){
   const mins=Math.max(0,Number(e.drive||0)+Number(e.work||0));
   const before=accumulated, after=before+mins;
@@ -462,17 +632,16 @@ for(const e of chronological){
   const b0=Math.max(0,before-cap25), b1=Math.max(0,after-cap25);
   const rate=Number(settings.rate)||0;
   let gross=((n1-n0)/60)*rate+((a1-a0)/60)*rate*1.25+((b1-b0)/60)*rate*1.5;
-  if(m.total>0 && mins>0) gross += primeForMonth*(mins/m.total);
   const meal=e.middayMeal?(e.middayLocation==='abroad'?Number(settings.vMiddayAbroad):Number(settings.vMidday)):0;
   const grand=e.grandDeplacement?(e.grandLocation==='abroad'?Number(settings.vGrandAbroad):Number(settings.vGrand)):0;
   const casse=e.casseCroute?Number(settings.vCasseCroute):0;
   dailyValues.set(e.date,gross*socialFactor+meal+grand+casse);
   accumulated=after;
 }
-let html=m.es.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(e=>{const dt=new Date(e.date+'T12:00:00');const wd=new Intl.DateTimeFormat($('language').value==='fr'?'fr-FR':'pt-PT',{weekday:'short'}).format(dt).replace('.','');const mo=new Intl.DateTimeFormat($('language').value==='fr'?'fr-FR':'pt-PT',{month:'short'}).format(dt).replace('.','');return `<article class="month-entry"><div class="month-entry-date"><span>${wd}</span><strong>${e.date.slice(8,10)}</strong><span>${mo}</span></div><div class="month-entry-main"><div class="month-entry-stats"><div class="month-entry-stat"><strong>◉ ${duration(e.drive)}</strong><span>Condução</span></div><div class="month-entry-stat"><strong>🔧 ${duration(e.work)}</strong><span>Outros</span></div><div class="month-entry-stat"><strong>◷ ${duration(e.drive+e.work)}</strong><span>Total</span></div></div><div class="month-entry-tags">${e.middayMeal?`<span class="month-entry-tag on">✓ Refeição${e.middayLocation==='abroad'?' · Estrangeiro':''}</span>`:''}${e.grandDeplacement?`<span class="month-entry-tag on">✓ Grand déplacement${e.grandLocation==='abroad'?' · Estrangeiro':''}</span>`:''}${e.casseCroute?'<span class="month-entry-tag on">✓ Casse-croûte</span>':''}</div></div><div class="month-entry-right"><strong class="month-entry-money">${euro(dailyValues.get(e.date)||0)}</strong><div class="month-entry-actions"><button class="secondary" aria-label="Editar ${e.date}" onclick="editEntry('${e.date}')">✎</button><button class="danger" aria-label="Apagar ${e.date}" onclick="removeEntry('${e.date}')">▣</button></div></div></article>`}).join('')||'Ainda não há registos neste mês.';$('allEntries').innerHTML=html}
+let html=m.es.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(e=>{const dt=new Date(e.date+'T12:00:00');const wd=new Intl.DateTimeFormat($('language').value==='fr'?'fr-FR':'pt-PT',{weekday:'short'}).format(dt).replace('.','');const mo=new Intl.DateTimeFormat($('language').value==='fr'?'fr-FR':'pt-PT',{month:'short'}).format(dt).replace('.','');return `<article class="month-entry"><div class="month-entry-date"><span>${wd}</span><strong>${e.date.slice(8,10)}</strong><span>${mo}</span></div><div class="month-entry-main"><div class="month-entry-stats"><div class="month-entry-stat"><strong><svg class="tachograph-wheel" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9.35" fill="none" stroke="currentColor" stroke-width="2.65"/><path d="M3.05 9.65 8.65 9.2Q10.05 9.05 11 8.15Q12 7.2 13 8.15Q13.95 9.05 15.35 9.2L20.95 9.65V13.85L15.15 14.35Q13.35 14.5 13.15 16.25L12.65 21.15H11.35L10.85 16.25Q10.65 14.5 8.85 14.35L3.05 13.85Z" fill="currentColor"/><circle cx="12" cy="11.9" r="2.05" fill="currentColor"/></svg> ${duration(e.drive)}</strong><span>Condução</span></div><div class="month-entry-stat"><strong>🔧 ${duration(e.work)}</strong><span>Outros</span></div><div class="month-entry-stat"><strong>◷ ${duration(e.drive+e.work)}</strong><span>Total</span></div></div><div class="month-entry-tags">${e.middayMeal?`<span class="month-entry-tag on">✓ Refeição${e.middayLocation==='abroad'?' · Estrangeiro':''}</span>`:''}${e.grandDeplacement?`<span class="month-entry-tag on">✓ Grand déplacement${e.grandLocation==='abroad'?' · Estrangeiro':''}</span>`:''}${e.casseCroute?'<span class="month-entry-tag on">✓ Casse-croûte</span>':''}</div></div><div class="month-entry-right"><strong class="month-entry-money">${euro(dailyValues.get(e.date)||0)}</strong><div class="month-entry-actions"><button type="button" class="secondary" aria-label="Editar ${e.date}" onclick="editEntry('${e.date}')">✎</button><button type="button" class="danger" aria-label="Apagar ${e.date}" onclick="removeEntry('${e.date}')">▣</button></div></div></article>`}).join('')||'Ainda não há registos neste mês.';$('allEntries').innerHTML=html;updateDailyEstimate()}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 window.removeEntry=date=>{if(confirm('Apagar o registo de '+date+'?')){entries=entries.filter(e=>e.date!==date);saveEntries();refresh()}}
-window.editEntry=date=>{let e=entries.find(x=>x.date===date);if(!e)return;$('date').value=e.date;$('drive').value=duration(e.drive);$('work').value=duration(e.work);updateDailyTotal();$('middayMeal').checked=!!e.middayMeal;$('middayLocation').value=e.middayLocation||'france';$('grandDeplacement').checked=!!e.grandDeplacement;$('grandLocation').value=e.grandLocation||'france';$('casseCroute').checked=!!e.casseCroute;syncAbroadChecks();document.querySelector('[data-tab="daily"]').click();window.scrollTo({top:0,behavior:'smooth'})}
+window.editEntry=date=>{let e=entries.find(x=>x.date===date);if(!e)return;$('date').value=e.date;$('drive').value=duration(e.drive);$('work').value=duration(e.work);updateDailyTotal();$('middayMeal').checked=!!e.middayMeal;$('middayLocation').value=e.middayLocation||'france';$('grandDeplacement').checked=!!e.grandDeplacement;$('grandLocation').value=e.grandLocation||'france';$('casseCroute').checked=!!e.casseCroute;syncLocationSelectors();document.querySelector('[data-tab="daily"]').click();window.scrollTo({top:0,behavior:'smooth'})}
 
 ['drive','work'].forEach(id=>{
   const field=$(id);
@@ -506,16 +675,25 @@ $('save').onclick=(event)=>{
   $('monthPicker').value=e.date.slice(0,7);refresh();alert('Registo guardado com sucesso.');
 };
 function syncLocationSelectors(){
-  [['middayMeal','middayLocation'],['grandDeplacement','grandLocation']].forEach(([checkId,selectId])=>{
+  [['middayMeal','middayLocation','middayLocationWrap'],['grandDeplacement','grandLocation','grandLocationWrap']].forEach(([checkId,selectId,wrapId])=>{
     const active=$(checkId).checked;
-    $(selectId).classList.toggle('hidden',!active);
-    $(selectId).setAttribute('aria-hidden',String(!active));
-    $(selectId).tabIndex=active?0:-1;
-    if(!active) $(selectId).value='france';
+    const select=$(selectId);
+    const wrap=$(wrapId);
+    const option=wrap.closest('.allowance-option');
+    wrap.classList.toggle('hidden',!active);
+    wrap.setAttribute('aria-hidden',String(!active));
+    option.classList.toggle('has-location',active);
+    select.setAttribute('aria-hidden',String(!active));
+    select.tabIndex=active?0:-1;
+    if(!active) select.value='france';
   });
 }
-$('middayMeal').addEventListener('change',()=>syncLocationSelectors());
-$('grandDeplacement').addEventListener('change',()=>syncLocationSelectors());
+$('middayMeal').addEventListener('change',()=>{syncLocationSelectors();updateDailyEstimate()});
+$('middayLocation').addEventListener('change',updateDailyEstimate);
+$('grandDeplacement').addEventListener('change',()=>{syncLocationSelectors();updateDailyEstimate()});
+$('grandLocation').addEventListener('change',updateDailyEstimate);
+syncLocationSelectors();
+$('casseCroute').addEventListener('change',()=>updateDailyEstimate());
 function resetDailyForm(){
   $('drive').value='0:00';$('work').value='0:00';
   ['middayMeal','grandDeplacement','casseCroute'].forEach(id=>$(id).checked=false);
@@ -530,14 +708,29 @@ function loadDailyEntry(e){
 // Ao mudar de data, começa a zero; se já existir um registo nesse dia, carrega-o para edição.
 $('date').addEventListener('change',()=>{
   const existing=entries.find(e=>e.date===$('date').value);
-  if(existing) loadDailyEntry(existing); else resetDailyForm();
+  if(existing) loadDailyEntry(existing); else resetDailyForm();updateDailyEstimate();
 });
 resetDailyForm();
-$('clear').onclick=resetDailyForm;
+$('clear').onclick=()=>{resetDailyForm();updateDailyEstimate()};
 $('monthPicker').onchange=refresh;
 function loadSettings(){Object.keys(settings).forEach(k=>{if($(k))$(k).value=settings[k]})}loadSettings();
 $('saveSettings').onclick=()=>{['rate','baseHours','limit25','premiumValue','threshold','socialRate','taxableBasePct','pasRate','vMidday','vMiddayAbroad','vGrand','vGrandAbroad','vCasseCroute'].forEach(k=>settings[k]=$(k).value);localStorage.setItem('driverpay_settings',JSON.stringify(settings));refresh();alert('Definições guardadas.')}
-document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));['daily','month','settings'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));if(b.dataset.tab==='month')refresh()});
+function showTab(tab){
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));
+  ['daily','month','settings'].forEach(id=>$(id).classList.toggle('hidden',id!==tab));
+  const settingsButton=document.querySelector('.settings-icon-btn');
+  if(settingsButton) settingsButton.classList.toggle('active',tab==='settings');
+  if(tab==='month') refresh();
+  if(tab==='settings') loadSettings();
+}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+const settingsButton=document.querySelector('.settings-icon-btn');
+if(settingsButton) settingsButton.addEventListener('click',()=>{
+  const settingsOpen=!$('settings').classList.contains('hidden');
+  showTab(settingsOpen?'daily':'settings');
+  settingsButton.setAttribute('aria-label',settingsOpen?'Definições':'Fechar definições');
+  settingsButton.setAttribute('title',settingsOpen?'Definições':'Fechar definições');
+});
 $('export').onclick=()=>{let rows=[['Data','Conducao_min','Outros_trabalhos_min','Refeicao_meio_dia','Local_refeicao','Grand_deplacement_1_refeicao_1_decoucher','Local_grand_deplacement','Casse_croute'],...entries.sort((a,b)=>a.date.localeCompare(b.date)).map(e=>[e.date,e.drive,e.work,!!e.middayMeal,e.middayLocation||'france',!!e.grandDeplacement,e.grandLocation||'france',!!e.casseCroute])];let csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\n');let blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='driver-pay-registos.csv';a.click();URL.revokeObjectURL(url)};
 function createCompleteBackup(){try{const backup={app:'DRIVER PAY',formatVersion:1,createdAt:new Date().toISOString(),entries,settings,language:localStorage.getItem('driverpay_language')||'pt'};const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='driver-pay-copia-completa-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);localStorage.setItem('driverpay_backup_last',String(Date.now()));alert((localStorage.getItem('driverpay_language')||'pt')==='fr'?'Sauvegarde complète préparée. Enregistrez le fichier dans un endroit sûr.':'Cópia de segurança completa preparada. Guarda o ficheiro num local seguro.')}catch(err){alert(((localStorage.getItem('driverpay_language')||'pt')==='fr'?'Impossible de créer la sauvegarde : ':'Não foi possível criar a cópia: ')+err.message)}}
 $('backupAll').onclick=createCompleteBackup;
@@ -546,11 +739,12 @@ $('backupAll').onclick=createCompleteBackup;
 $('restoreAll').onclick=()=> $('backupFile').click();
 $('backupFile').onchange=async ev=>{const file=ev.target.files&&ev.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!data||data.app!=='DRIVER PAY'||data.formatVersion!==1||!Array.isArray(data.entries)||!data.settings||typeof data.settings!=='object')throw new Error('O ficheiro não é uma cópia de segurança DRIVER PAY válida.');const valid=data.entries.every(e=>e&&/^\d{4}-\d{2}-\d{2}$/.test(e.date)&&Number.isFinite(Number(e.drive))&&Number.isFinite(Number(e.work)));if(!valid)throw new Error('A cópia contém registos inválidos. Nenhum dado foi alterado.');const byDate=new Map(entries.map(e=>[e.date,e]));let added=0,updated=0;for(const e of data.entries){if(byDate.has(e.date))updated++;else added++;byDate.set(e.date,e)}if(!confirm('Restaurar esta cópia completa?\nRegistos novos: '+added+'\nRegistos atualizados: '+updated+'\nOs outros dias serão mantidos.\nAs definições e o idioma atuais serão substituídos pelos da cópia.'))return;entries=Array.from(byDate.values()).sort((a,b)=>a.date.localeCompare(b.date));settings={...settings,...data.settings};saveEntries();localStorage.setItem('driverpay_settings',JSON.stringify(settings));const lang=data.language==='fr'?'fr':'pt';localStorage.setItem('driverpay_language',lang);loadSettings();refresh();const languageControl=$('language');if(languageControl){languageControl.value=lang;languageControl.dispatchEvent(new Event('change'));}alert('Restauro concluído.\nRegistos novos: '+added+'\nRegistos atualizados: '+updated+'.\nDefinições e idioma recuperados.')}catch(err){alert('Não foi possível restaurar a cópia: '+err.message)}finally{ev.target.value=''}};
 $('deleteAll').onclick=()=>{if(confirm('Tens a certeza de que queres apagar todos os registos?')){entries=[];saveEntries();refresh()}}
-refresh();updateDailyTotal();
+
+refresh();updateDailyTotal();updateDailyEstimate();
 </script>
 <script>
 (function(){
- const translations = {"Controlo de trabalho e remuneração": "Suivi du travail et de la rémunération", "Contribuições sociais estimadas": "Cotisations sociales estimées", "Net social estimado": "Net social estimé", "Base tributável estimada": "Base imposable estimée", "Taxa efetiva estimada de contribuições sociais (%)": "Taux effectif estimé des cotisations sociales (%)", "Base tributável estimada (% do bruto)": "Base imposable estimée (% du brut)", "Horas normais por mês": "Heures normales par mois", "Limite mensal do escalão +25% (horas)": "Limite mensuelle de la tranche à +25 % (heures)", "Horas normais": "Heures normales", "Horas extra +25%": "Heures supplémentaires +25 %", "Horas extra +50%": "Heures supplémentaires +50 %", "Total das horas remuneradas": "Total des heures rémunérées", "Regra inicial simulada com base no recibo anterior: até 152 h normais; da 153.ª à 186.ª hora, +25%; acima de 186 h, +50%. Confirma estes limites com a Hubert antes de usar como cálculo definitivo.": "Règle initiale simulée d’après l’ancien bulletin : jusqu’à 152 h normales ; de la 153e à la 186e heure, +25 % ; au-delà de 186 h, +50 %. Confirme ces seuils auprès de Hubert avant d’utiliser ce calcul comme définitif.", "Registo diário": "Saisie quotidienne", "Resumo mensal": "Récapitulatif mensuel", "Definições": "Paramètres", "Resumo acumulado do mês": "Récapitulatif du mois", "Salário líquido estimado": "Salaire net estimé", "Por avaliar": "À vérifier", "Ajudas de deslocação": "Indemnités de déplacement", "Por definir": "À définir", "Total estimado": "Total estimé", "Novo registo": "Nouvelle saisie", "Data": "Date", "Condução": "Conduite", "Tempo (escreve 715 → aparece 7:15)": "Durée (saisir 715 → affiche 7:15)", "Outros trabalhos": "Autres travaux", "Podes registar 0:00 em condução e outros trabalhos. A aplicação identifica automaticamente um fim de semana quando sábado e domingo têm zero horas e pelo menos uma ajuda assinalada em cada dia. Não acrescenta qualquer valor extra por contar o fim de semana.": "Tu peux saisir 0:00 en conduite et en autres travaux. L’application détecte automatiquement un week-end lorsque le samedi et le dimanche sont à zéro heure et qu’au moins une indemnité est cochée chaque jour. Aucun montant supplémentaire n’est ajouté.", "Indemnizações de deslocação": "Indemnités de déplacement", "Refeição do meio-dia": "Repas de midi", "Casse-croûte (antes das 5h00)": "Casse-croûte (avant 5 h)", "Casse-croûte (€)": "Casse-croûte (€)", "Casse-croûte": "Casse-croûte", "Refeição no estrangeiro": "Repas à l’étranger", "Dormida no estrangeiro": "Nuitée à l’étranger", "França": "France", "Estrangeiro": "Étranger", "Grand déplacement (1 refeição + 1 découcher)": "Grand déplacement (1 repas + 1 découcher)", "Grand déplacement (1 refeição + 1 dormida)": "Grand déplacement (1 repas + 1 découcher)", "Guardar registo": "Enregistrer", "Limpar": "Effacer", "Registos deste mês": "Saisies du mois", "Ainda não há registos.": "Aucune saisie pour le moment.", "Mês": "Mois", "Dias registados": "Jours enregistrés", "Fins de semana com ajudas": "Week-ends avec indemnités", "Total de serviço": "Temps de service total", "Refeições assinaladas": "Repas cochés", "Dormidas": "Découchers", "Salário": "Salaire", "Percentagem de outros trabalhos": "Pourcentage des autres travaux", "Estado da Prime Chimie": "Statut de la Prime Chimie", "Horas × valor hora configurado": "Heures × taux horaire configuré", "Prime chimie estimada": "Prime Chimie estimée", "Salário bruto estimado": "Salaire brut estimé", "Retenção na fonte (PAS) estimada": "Prélèvement à la source (PAS) estimé", "Salário líquido estimado após PAS": "Salaire net estimé après PAS", "Subtotal ajudas de deslocação": "Sous-total des indemnités de déplacement", "Total estimado a receber (líquido + ajudas)": "Total estimé à percevoir (net + indemnités)", "Todos os dias": "Tous les jours", "Valor estimado do dia": "Valeur estimée du jour", "Valor diário líquido estimado, incluindo ajudas. As horas suplementares seguem os escalões acumulados do mês; a Prime Chimie é distribuída proporcionalmente pelos dias com horas.": "Valeur nette journalière estimée, indemnités incluses. Les heures supplémentaires suivent les tranches cumulées du mois ; la Prime Chimie est répartie proportionnellement entre les jours travaillés.", "Sem registos.": "Aucune saisie.", "Definições de pagamento": "Paramètres de rémunération", "Valor hora (€)": "Taux horaire (€)", "Prémio (€)": "Prime (€)", "Limite máximo de outros trabalhos para manter a prime chimie (%)": "Seuil maximal d’autres travaux pour conserver la Prime Chimie (%)", "Retenção na fonte (PAS) estimada (%)": "Prélèvement à la source (PAS) estimé (%)", "Indemnizações (recibo atual)": "Indemnités (bulletin actuel)", "Tarifas atualizadas com base no teu recibo atual. Podes alterá-las se a empresa atualizar os valores.": "Tarifs mis à jour d’après ton bulletin actuel. Tu peux les modifier si l’entreprise les met à jour.", "Refeição do meio-dia — França (€)": "Repas de midi — France (€)", "Refeição do meio-dia — estrangeiro (€)": "Repas de midi — étranger (€)", "Grand déplacement — França (€)": "Grand déplacement — France (€)", "Grand déplacement — estrangeiro (€)": "Grand déplacement — étranger (€)", "Guardar definições": "Enregistrer les paramètres", "Dados": "Données", "Exportar registos (CSV)": "Exporter les saisies (CSV)", "Criar cópia de segurança completa": "Créer une sauvegarde complète", "Restaurar cópia de segurança": "Restaurer une sauvegarde", "A cópia completa inclui registos, definições de pagamento e idioma. Ao restaurar, os registos são combinados por data: os dias incluídos na cópia substituem os mesmos dias atuais; os restantes são mantidos. As definições e o idioma são recuperados da cópia.": "La sauvegarde complète inclut les saisies, les paramètres de rémunération et la langue. Lors de la restauration, les saisies sont fusionnées par date : les dates présentes dans la sauvegarde remplacent les mêmes dates actuelles ; les autres sont conservées. Les paramètres et la langue sont restaurés depuis la sauvegarde.", "Apagar todos os registos": "Supprimer toutes les saisies", "Editar": "Modifier", "Apagar": "Supprimer", "Atribuída": "Attribuée", "Não atribuída": "Non attribuée", "Limite provisório: 33,75% de outros trabalhos no total mensal. Baseado no recibo de julho de 2025; confirmar com a Hubert.": "Seuil provisoire : 33,75 % d’autres travaux sur le total mensuel. Basé sur le bulletin de juillet 2025 ; à confirmer auprès de Hubert.", "Limite provisório de 33,75%: a Prime é atribuída até esse valor. Acima dele, não é atribuída. Este limite foi inferido do recibo de julho de 2025 e deve ser confirmado com a Hubert.": "Seuil provisoire de 33,75 % : la prime est attribuée jusqu’à ce seuil. Au-delà, elle ne l’est pas. Seuil déduit du bulletin de juillet 2025, à confirmer auprès de Hubert.", "Não representa necessariamente o líquido a receber.": "Ne représente pas nécessairement le montant net réellement versé.", "Este mês": "Ce mois-ci", "Resumo acumulado": "Récapitulatif cumulé", "Horas totais": "Heures totales", "registo": "saisie", "registos": "saisies", "Refeição": "Repas", "Refeições": "Repas", "Refeição — França": "Repas — France", "Refeição — estrangeiro": "Repas — étranger", "Grand déplacement — França": "Grand déplacement — France", "Grand déplacement — estrangeiro": "Grand déplacement — étranger", "Casse-croûte (": "Casse-croûte ("};
+ const translations = {"Controlo de trabalho e remuneração": "Suivi du travail et de la rémunération", "Contribuições sociais estimadas": "Cotisations sociales estimées", "Net social estimado": "Net social estimé", "Base tributável estimada": "Base imposable estimée", "Taxa efetiva estimada de contribuições sociais (%)": "Taux effectif estimé des cotisations sociales (%)", "Base tributável estimada (% do bruto)": "Base imposable estimée (% du brut)", "Horas normais por mês": "Heures normales par mois", "Limite mensal do escalão +25% (horas)": "Limite mensuelle de la tranche à +25 % (heures)", "Horas normais": "Heures normales", "Horas extra +25%": "Heures supplémentaires +25 %", "Horas extra +50%": "Heures supplémentaires +50 %", "Total das horas remuneradas": "Total des heures rémunérées", "Regra inicial simulada com base no recibo anterior: até 152 h normais; da 153.ª à 186.ª hora, +25%; acima de 186 h, +50%.": "Règle initiale simulée d’après l’ancien bulletin : jusqu’à 152 h normales ; de la 153e à la 186e heure, +25 % ; au-delà de 186 h, +50%.", "VALOR ESTIMADO DESTE DIA": "VALEUR ESTIMÉE DE CE JOUR", "Remuneração": "Rémunération", "Ajudas / diárias": "Indemnités / forfaits", "Total estimado": "Total estimé", "Estimativa atualizada com as horas e ajudas registadas.": "Estimation mise à jour avec les heures et indemnités saisies.", "Registo diário": "Saisie quotidienne", "Resumo mensal": "Récapitulatif mensuel", "Definições": "Paramètres", "Resumo acumulado do mês": "Récapitulatif du mois", "Salário líquido estimado": "Salaire net estimé", "Por avaliar": "À vérifier", "Ajudas de deslocação": "Indemnités de déplacement", "Por definir": "À définir", "Total estimado": "Total estimé", "Novo registo": "Nouvelle saisie", "Data": "Date", "Condução": "Conduite", "Tempo (escreve 715 → aparece 7:15)": "Durée (saisir 715 → affiche 7:15)", "Outros trabalhos": "Autres travaux", "Podes registar 0:00 em condução e outros trabalhos. A aplicação identifica automaticamente um fim de semana quando sábado e domingo têm zero horas e pelo menos uma ajuda assinalada em cada dia.": "Tu peux enregistrer 0:00 en conduite et en autres travaux. L’application identifie automatiquement un week-end lorsque le samedi et le dimanche comptent zéro heure et qu’au moins une indemnité est cochée chaque jour.", "Introduz o tempo no formato 715 = 7h15 ou 730 = 7h30. Carregamentos, descargas, abastecimentos e lavagens contam como outros trabalhos.": "Saisis la durée au format 715 = 7 h 15 ou 730 = 7 h 30. Les chargements, déchargements, ravitaillements et lavages comptent comme autres travaux.", "Indemnizações de deslocação": "Indemnités de déplacement", "Refeição do meio-dia": "Repas de midi", "Casse-croûte (antes das 5h00)": "Casse-croûte (avant 5 h)", "Casse-croûte (€)": "Casse-croûte (€)", "Casse-croûte": "Casse-croûte", "Refeição no estrangeiro": "Repas à l’étranger", "Dormida no estrangeiro": "Nuitée à l’étranger", "França": "France", "Estrangeiro": "Étranger", "Grand déplacement (1 refeição + 1 découcher)": "Grand déplacement (1 repas + 1 découcher)", "Grand déplacement (1 refeição + 1 dormida)": "Grand déplacement (1 repas + 1 découcher)", "Guardar registo": "Enregistrer", "Limpar": "Effacer", "Registos deste mês": "Saisies du mois", "Ainda não há registos.": "Aucune saisie pour le moment.", "Mês": "Mois", "Dias registados": "Jours enregistrés", "Fins de semana com ajudas": "Week-ends avec indemnités", "Total de serviço": "Temps de service total", "Refeições assinaladas": "Repas cochés", "Dormidas": "Découchers", "Salário": "Salaire", "Percentagem de outros trabalhos": "Pourcentage des autres travaux", "Estado da Prime Chimie": "Statut de la Prime Chimie", "Horas × valor hora configurado": "Heures × taux horaire configuré", "Prime chimie estimada": "Prime Chimie estimée", "Salário bruto estimado": "Salaire brut estimé", "Retenção na fonte (PAS) estimada": "Prélèvement à la source (PAS) estimé", "Salário líquido estimado após PAS": "Salaire net estimé après PAS", "Subtotal ajudas de deslocação": "Sous-total des indemnités de déplacement", "Total estimado a receber (líquido + ajudas)": "Total estimé à percevoir (net + indemnités)", "Todos os dias": "Tous les jours", "Valor estimado do dia": "Valeur estimée du jour", "Valor diário líquido estimado, incluindo ajudas. As horas suplementares seguem os escalões acumulados do mês. A Prime Chimie é calculada no resumo mensal.": "Valeur nette journalière estimée, indemnités incluses. Les heures supplémentaires suivent les tranches cumulées du mois. La Prime Chimie est calculée dans le récapitulatif mensuel.", "Sem registos.": "Aucune saisie.", "Os valores apresentados são estimativas e podem diferir do recibo de vencimento.": "Les montants affichés sont des estimations et peuvent différer du bulletin de paie.", "Definições de pagamento": "Paramètres de rémunération", "Valor hora (€)": "Taux horaire (€)", "Prémio (€)": "Prime (€)", "Limite máximo de outros trabalhos para manter a prime chimie (%)": "Seuil maximal d’autres travaux pour conserver la Prime Chimie (%)", "Retenção na fonte (PAS) estimada (%)": "Prélèvement à la source (PAS) estimé (%)", "Indemnizações (recibo atual)": "Indemnités (bulletin actuel)", "Tarifas atualizadas com base no teu recibo atual. Podes alterá-las se a empresa atualizar os valores.": "Tarifs mis à jour d’après ton bulletin actuel. Tu peux les modifier si l’entreprise les met à jour.", "Refeição do meio-dia — França (€)": "Repas de midi — France (€)", "Refeição do meio-dia — estrangeiro (€)": "Repas de midi — étranger (€)", "Grand déplacement — França (€)": "Grand déplacement — France (€)", "Grand déplacement — estrangeiro (€)": "Grand déplacement — étranger (€)", "Guardar definições": "Enregistrer les paramètres", "Dados": "Données", "Exportar registos (CSV)": "Exporter les saisies (CSV)", "Criar cópia de segurança completa": "Créer une sauvegarde complète", "Restaurar cópia de segurança": "Restaurer une sauvegarde", "A cópia completa inclui registos, definições de pagamento e idioma. Ao restaurar, os registos são combinados por data: os dias incluídos na cópia substituem os mesmos dias atuais; os restantes são mantidos. As definições e o idioma são recuperados da cópia.": "La sauvegarde complète inclut les saisies, les paramètres de rémunération et la langue. Lors de la restauration, les saisies sont fusionnées par date : les dates présentes dans la sauvegarde remplacent les mêmes dates actuelles ; les autres sont conservées. Les paramètres et la langue sont restaurés depuis la sauvegarde.", "Apagar todos os registos": "Supprimer toutes les saisies", "Editar": "Modifier", "Apagar": "Supprimer", "Atribuída": "Attribuée", "Não atribuída": "Non attribuée", "Limite provisório: 33,75% de outros trabalhos no total mensal. Baseado no recibo de julho de 2025; confirmar com a Hubert.": "Seuil provisoire : 33,75 % d’autres travaux sur le total mensuel. Basé sur le bulletin de juillet 2025 ; à confirmer auprès de Hubert.", "Regra da Prime Chimie: é atribuída quando as horas de outros trabalhos representam, no máximo, 33,75% do total de horas trabalhadas no mês (condução + outros trabalhos). Acima desse limite, o prémio não é atribuído.": "Règle de la Prime Chimie : elle est attribuée lorsque les heures consacrées aux autres travaux représentent au maximum 33,75 % du total des heures travaillées dans le mois (conduite + autres travaux). Au-delà de ce seuil, la prime n’est pas attribuée.", "Não representa necessariamente o líquido a receber.": "Ne représente pas nécessairement le montant net réellement versé.", "Este mês": "Ce mois-ci", "Resumo acumulado": "Récapitulatif cumulé", "Horas totais": "Heures totales", "registo": "saisie", "registos": "saisies", "Refeição": "Repas", "Refeições": "Repas", "Refeição — França": "Repas — France", "Refeição — estrangeiro": "Repas — étranger", "Grand déplacement — França": "Grand déplacement — France", "Grand déplacement — estrangeiro": "Grand déplacement — étranger", "Casse-croûte (": "Casse-croûte ("};
  const langSelect=document.getElementById('language');
  function translateText(node,lang){
    if(node.nodeType===Node.TEXT_NODE){
